@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "970406457495",
+    "project_id": "flash-note-fc41e",
+    "storage_bucket": "flash-note-fc41e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970406457495:android:240e028f9616e6639eb9d2",
+        "android_client_info": {
+          "package_name": "com.nav.noteit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "970406457495-m8bl2jksge9vbe60417ua8j9jioqoa0k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nav.noteit",
+            "certificate_hash": "49d9733d61e5b24bc2aab9ccf7977af2f6f0dc00"
+          }
+        },
+        {
+          "client_id": "970406457495-v6n9ptgnt93qr7cua2eu6hv6jhic973v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0M--N0Q4-9WOrphel2JIEAXlsiVjkTyo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970406457495-v6n9ptgnt93qr7cua2eu6hv6jhic973v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

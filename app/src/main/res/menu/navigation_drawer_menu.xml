@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/actionNotes"
+            android:checked="true"
+            android:icon="@drawable/ic_note_24"
+            android:title="@string/notes" />
+        <item
+            android:id="@+id/actionReminder"
+            android:icon="@drawable/baseline_access_reminder_24"
+            android:title="@string/reminders" />
+        <item
+            android:id="@+id/actionSetting"
+            android:icon="@drawable/ic_settings_24"
+            android:title="@string/settings" />
+
+
+
+    </group>
+
+
+    <item
+        android:id="@+id/actionLogout"
+        android:icon="@drawable/ic_logout_24"
+        android:title="@string/logout" />
+
+
+</menu>

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Flash Notes</string>
+    <string name="notes">Notes</string>
+    <string name="reminders">Reminders</string>
+    <string name="settings">Settings</string>
+    <string name="logout">Logout</string>
+    <string name="user_name">User Name</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_a_new_note_reminder">Create a new Note/Reminder</string>
+    <string name="create">Create</string>
+    <string name="create_a_new_note">Create a new Note.</string>
+    <string name="add_a_new_reminder">Add a new Reminder</string>
+    <string name="search_notes">Search Notes</string>
+    <string name="title">Title</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="client_server_id">970406457495-m8bl2jksge9vbe60417ua8j9jioqoa0k.apps.googleusercontent.com</string>
+</resources>

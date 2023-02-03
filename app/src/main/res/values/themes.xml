@@ -1,0 +1,45 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.NoteIt" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/yellow_400</item>
+        <item name="colorPrimaryVariant">@color/yellow_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/grey_200</item>
+        <item name="colorSecondaryVariant">@color/white</item>
+        <item name="colorOnSecondary">@color/grey_900</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/statusBarBackground</item>
+        <item name="statusBarForeground">@color/grey_900</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- Customize your theme here. -->
+        <!--Text Colors-->
+        <item name="android:textColorPrimary">@color/txt_color</item>
+        <item name="statusBarBackground">@color/white</item>
+        <item name="android:windowBackground">@color/white</item>
+
+
+
+        <item name="colorAccent">@color/grey_900</item>
+
+    </style>
+
+    <style name="fab_square_shape">
+        <item name="shapeCornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">10dp</item>
+        <item name="cornerSizeTopRight">10dp</item>
+        <item name="cornerSizeBottomLeft">10dp</item>
+        <item name="cornerSizeBottomRight">10dp</item>
+
+    </style>
+
+
+    <style name="divider">
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/grey_500</item>
+        <item name="android:layout_marginStart">15dp</item>
+        <item name="android:layout_marginEnd">15dp</item>
+    </style>
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.FragEditNote">
+
+    <EditText
+        android:id="@+id/edtTitleNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edt_bg"
+        android:hint="@string/title"
+        android:layout_margin="10dp"
+        android:inputType="textCapSentences"
+        android:padding="8dp"
+        android:textSize="@dimen/note_title"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/edtNote"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/edt_bg"
+        android:gravity="top|start"
+        android:hint="@string/notes"
+        android:inputType="textMultiLine"
+        android:imeOptions="flagNoEnterAction"
+        android:lineSpacingMultiplier="1.2"
+        android:layout_margin="10dp"
+        android:padding="8dp"
+        android:ems="7"
+        android:scrollbars="vertical"
+        android:textSize="@dimen/note_content"
+        app:layout_constraintTop_toBottomOf="@+id/edtTitleNote"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

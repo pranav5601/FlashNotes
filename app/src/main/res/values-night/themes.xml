@@ -1,0 +1,41 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.NoteIt" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/grey_900</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/grey_700</item>
+        <item name="colorSecondaryVariant">@color/grey_500</item>
+        <item name="colorOnSecondary">@color/yellow_400</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/grey_900</item>
+        <!-- Customize your theme here. -->
+        <!--Text Color-->
+        <item name="android:windowBackground">@color/grey_900</item>
+        <item name="android:textColorPrimary">@color/txt_color</item>
+        <item name="appBarLayoutStyle">@style/appBarStyle</item>
+
+        <item name="colorAccent">@color/yellow_400</item>
+
+    </style>
+
+    <style name="fab_square_shape">
+    <item name="shapeCornerFamily">cut</item>
+    <item name="cornerSizeTopLeft">10dp</item>
+    <item name="cornerSizeTopRight">10dp</item>
+    <item name="cornerSizeBottomLeft">10dp</item>
+    <item name="cornerSizeBottomRight">10dp</item>
+    </style>
+    <style name="appBarStyle">
+        <item name="backgroundColor">@color/grey_900</item>
+    </style>
+    <style name="divider">
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/grey_200</item>
+        <item name="android:layout_marginStart">15dp</item>
+        <item name="android:layout_marginEnd">15dp</item>
+    </style>
+</resources>
