@@ -4,10 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.nav.noteit.dao.NoteDao
+import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.room_models.Note
 
-@Database(entities = arrayOf(Note::class), version = 2, exportSchema = false)
+@Database(entities = [Note::class], version = 2, exportSchema = false)
+@TypeConverters(ListToStringTypeConverter::class)
 abstract class NoteDatabase : RoomDatabase(){
 
     abstract fun getNoteDao(): NoteDao

@@ -49,13 +49,6 @@
             android:contentDescription="@string/create_a_new_note" />
 
 
-
-            <View
-                android:visibility="invisible"
-                android:background="@drawable/floating_btn_bg_screen"
-                android:layout_width="64dp"
-                android:layout_height="64dp"/>
-
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/btnCreateAction"
                 android:layout_width="wrap_content"
@@ -68,7 +61,6 @@
                 android:contentDescription="@string/create_a_new_note_reminder"
                 android:focusable="true"
                 android:src="@drawable/ic_plus_1"
-
                 app:shapeAppearance="@style/fab_square_shape"
                 />
 

@@ -86,6 +86,11 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
 
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        selectMenuDrawer()
+    }
+
 
     private fun initClick() {
         binding.btnCreateAction.setOnClickListener {

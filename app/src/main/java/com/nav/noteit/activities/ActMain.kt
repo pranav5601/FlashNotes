@@ -12,6 +12,8 @@ import androidx.fragment.app.FragmentTransaction
 import com.nav.noteit.R
 import com.nav.noteit.databinding.ActMainBinding
 import com.nav.noteit.fragments.FragNotes
+import com.nav.noteit.fragments.FragReminders
+import com.nav.noteit.helper.Utils
 import com.nav.noteit.viewmodel.NoteViewModel
 import com.nav.noteit.viewmodel.SearchViewModel
 import org.koin.android.ext.android.inject
@@ -20,12 +22,9 @@ import org.koin.android.ext.android.inject
 class ActMain : ActBase() {
 
 
-
-
     private lateinit var binding: ActMainBinding
     lateinit var menu: Menu
     private val searchViewModel: SearchViewModel by viewModels()
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,37 +38,55 @@ class ActMain : ActBase() {
         initFragment()
         setNavigationDrawer()
         searchNote()
+//        selectMenuDrawer()
 
 
     }
 
 
+    fun selectMenuDrawer() {
+        for (frag in supportFragmentManager.fragments) {
+            when (frag) {
+                is FragNotes -> {
+                    binding.mainNavView.setCheckedItem(R.id.actionNotes)
+                }
 
-    fun changeToSaveIcon(isShow:Boolean, clickListeners: ClickListeners?){
-        if(isShow){
-            binding.imgSideMenu.setImageResource(R.drawable.ic_save)
-             binding.imgSideMenu.setOnClickListener {
-                clickListeners?.onSaveBtnClick()
-             }
-        }else{
-            binding.imgSideMenu.setImageResource(R.drawable.note_it_logo)
-            binding.imgSideMenu.setOnClickListener {  }
+                is FragReminders -> {
+                    binding.mainNavView.setCheckedItem(R.id.actionReminder)
+                }
+
+                else -> {
+                    binding.mainNavView.setCheckedItem(R.id.actionNotes)
+                }
+            }
         }
     }
 
 
+    fun changeToSaveIcon(isShow: Boolean, clickListeners: ClickListeners?) {
+        if (isShow) {
+            binding.imgSideMenu.setImageResource(R.drawable.ic_save)
+            binding.imgSideMenu.setOnClickListener {
+                clickListeners?.onSaveBtnClick()
+            }
+        } else {
+            binding.imgSideMenu.setImageResource(R.drawable.note_it_logo)
+            binding.imgSideMenu.setOnClickListener { }
+        }
+    }
 
-    private fun searchNote(){
-        binding.edtSearchNote.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+
+    private fun searchNote() {
+        binding.edtSearchNote.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if(newText != null && newText.isNotEmpty()){
+                if (newText != null && newText.isNotEmpty()) {
                     searchViewModel.selectItem(newText)
                     searchViewModel.emptySearch(false)
-                }else{
+                } else {
                     searchViewModel.emptySearch(true)
                     println("No letter")
                 }
@@ -80,14 +97,13 @@ class ActMain : ActBase() {
     }
 
 
-
     fun changeIconToBack(isShow: Boolean) {
         if (isShow) {
             binding.mainToolbar.navigationIcon =
                 AppCompatResources.getDrawable(baseContext, R.drawable.baseline_arrow_back_24)
             binding.edtSearchNote.visibility = View.INVISIBLE
             binding.mainToolbar.setNavigationOnClickListener {
-                if(supportFragmentManager.backStackEntryCount > 0){
+                if (supportFragmentManager.backStackEntryCount > 0) {
 
                     supportFragmentManager.popBackStackImmediate()
                 }
@@ -119,7 +135,6 @@ class ActMain : ActBase() {
     }
 
 
-
     private fun setNavigationDrawer() {
         binding.mainNavView.setNavigationItemSelectedListener {
 
@@ -129,11 +144,45 @@ class ActMain : ActBase() {
 
             when (it.itemId) {
                 R.id.actionNotes -> {
+
+                    if (supportFragmentManager.findFragmentById(R.id.mainFragContainer) is FragNotes) {
+                        binding.mainDrawerLyt.closeDrawer(GravityCompat.START)
+                    } else {
+
+                        if (supportFragmentManager.backStackEntryCount >= 0) {
+                            supportFragmentManager.popBackStackImmediate()
+                        }
+                        Utils.replaceFrag(
+                            supportFragmentManager,
+                            R.id.mainFragContainer,
+                            FragNotes(),
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_left,
+                            0,
+                            0
+                        )
+                    }
                     true
                 }
+
                 R.id.actionReminder -> {
+                    if (supportFragmentManager.findFragmentById(R.id.mainFragContainer) is FragReminders) {
+                        binding.mainDrawerLyt.closeDrawer(GravityCompat.START)
+                    } else {
+
+                        Utils.addFrag(
+                            supportFragmentManager,
+                            R.id.mainFragContainer,
+                            FragReminders(),
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_left,
+                            0,
+                            0
+                        )
+                    }
                     true
                 }
+
                 R.id.actionSetting -> {
                     true
                 }
@@ -141,6 +190,7 @@ class ActMain : ActBase() {
                 R.id.actionLogout -> {
                     true
                 }
+
                 else -> {
                     false
                 }
@@ -171,7 +221,6 @@ class ActMain : ActBase() {
     interface ClickListeners {
         fun onSaveBtnClick()
     }
-
 
 
 }

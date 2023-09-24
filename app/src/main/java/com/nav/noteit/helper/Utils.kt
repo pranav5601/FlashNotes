@@ -2,15 +2,18 @@ package com.nav.noteit.helper
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
+import android.net.Uri
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.nav.noteit.R
-import com.nav.noteit.activities.ActMain
+import java.io.FileNotFoundException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+
 
 object Utils {
 
@@ -23,8 +26,9 @@ object Utils {
         fragTransaction.commit()
     }
 
-    fun replaceFrag(fragmentManager: FragmentManager, containerId:Int=0, fragment: Fragment){
+    fun replaceFrag(fragmentManager: FragmentManager, containerId:Int=0, fragment: Fragment,anim_enter: Int, anim_exit: Int,  pop_enter: Int, pop_exit: Int){
         val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+        fragTransaction.setCustomAnimations(anim_enter, anim_exit, pop_enter, pop_exit)
         fragTransaction.replace(containerId,fragment)
         fragTransaction.commit()
     }
@@ -38,6 +42,15 @@ object Utils {
     }
 
 
+    fun uriToBitmap(uri: Uri?, context: Context): Bitmap? {
+        var bitmap: Bitmap? = null
+        try {
+            bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri!!))
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        return bitmap
+    }
 
     private fun isInternetConnectedCheck(mContext: Context?): Boolean {
         var outcome = false

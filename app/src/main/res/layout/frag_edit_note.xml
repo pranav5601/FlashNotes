@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,39 +7,96 @@
     android:orientation="vertical"
     tools:context=".fragments.FragEditNote">
 
-    <EditText
-        android:id="@+id/edtTitleNote"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edt_bg"
-        android:hint="@string/title"
-        android:layout_margin="10dp"
-        android:inputType="textCapSentences"
-        android:padding="8dp"
-        android:textSize="@dimen/note_title"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/edtNote"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/edt_bg"
-        android:gravity="top|start"
-        android:hint="@string/notes"
-        android:inputType="textMultiLine"
-        android:imeOptions="flagNoEnterAction"
-        android:lineSpacingMultiplier="1.2"
-        android:layout_margin="10dp"
-        android:padding="8dp"
-        android:ems="7"
-        android:scrollbars="vertical"
-        android:textSize="@dimen/note_content"
-        app:layout_constraintTop_toBottomOf="@+id/edtTitleNote"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/lytEditNoteImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/lytTxtContent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvEditImages"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp" />
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/lytTxtContent"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toBottomOf="@id/lytEditNoteImage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" >
+                <EditText
+                    android:id="@+id/edtTitleNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/edt_bg"
+                    android:hint="@string/title"
+                    android:inputType="textCapSentences"
+                    android:padding="8dp"
+                    android:textSize="@dimen/note_title"
+                    />
+
+                <EditText
+                    android:id="@+id/edtNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:autoLink="all"
+                    android:background="@drawable/edt_bg"
+                    android:ems="7"
+                    android:gravity="top|start"
+                    android:hint="@string/notes"
+                    android:imeOptions="flagNoEnterAction"
+                    android:inputType="textMultiLine"
+                    android:lineSpacingMultiplier="1.2"
+                    android:padding="8dp"
+                    android:scrollbars="vertical"
+                    android:textSize="@dimen/note_content"
+                    app:layout_constraintTop_toBottomOf="@+id/edtTitleNote"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddPhotos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/add_photos"
+        app:shapeAppearance="@style/fab_square_shape"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

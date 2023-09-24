@@ -34,6 +34,13 @@ abstract class FragBase<T : ViewBinding> : Fragment() {
         }
 
     }
+    fun selectMenuDrawer() {
+
+        if (baseContext is ActMain) {
+            (baseContext as? ActMain)?.selectMenuDrawer()
+        }
+
+    }
     fun changeToSaveIcon(isShow: Boolean, clickListeners: ActMain.ClickListeners) {
 
         if (baseContext is ActMain) {

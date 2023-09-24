@@ -16,6 +16,7 @@ abstract class ActBase : AppCompatActivity() {
 
 
 
+
     }
 
     override fun onDestroy() {
