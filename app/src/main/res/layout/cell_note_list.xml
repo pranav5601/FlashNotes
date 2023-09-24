@@ -30,9 +30,11 @@
             <TextView
                 android:layout_marginTop="10dp"
                 android:id="@+id/txtNoteContent"
+                android:maxLines="10"
+                android:ellipsize="end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Note Content"
+                android:text="@string/note_content"
                 android:textSize="@dimen/note_content" />
 
 

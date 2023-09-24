@@ -50,7 +50,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val selectedImageUris = mutableListOf<Uri>()
     private lateinit var imgListAdapter: AdapterImageList
-
+    private val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
 
     private val TAG = "ImageSelectionActivity"
 
@@ -63,8 +63,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         initView()
         initClick()
         setData()
-
-
 
     }
 
@@ -102,11 +100,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         imgListAdapter = AdapterImageList(baseContext, this)
         imgListAdapter.updateImages(uriList)
         binding.rcvEditImages.setHasFixedSize(true)
-        binding.rcvEditImages.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL)
+        binding.rcvEditImages.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.HORIZONTAL)
         binding.rcvEditImages.adapter = imgListAdapter
-
-
-
 
 
     }
@@ -249,8 +244,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
             // Callback is invoked after the user selects a media item or closes the
             // photo picker.
             if (uri != null) {
+                baseContext.contentResolver.takePersistableUriPermission(uri, flag)
 
-//                noteBitMap = Utils.uriToBitmap(uri, baseContext)
 //                noteBitMap?.let { imgString = imgBitmapString.bitmapToString(it) }
 
                 uri.let { imgDataList.add(uri.toString()) }
