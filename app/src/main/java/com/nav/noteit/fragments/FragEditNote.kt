@@ -41,7 +41,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private var oldNote: Note? = null
     private var editNote: Boolean? = false
     private val noteViewModel by inject<NoteViewModel>()
-    private val listToString by inject<ListToStringTypeConverter> ()
+    private val listToString by inject<ListToStringTypeConverter>()
     lateinit var noteTitle: String
     private var finalString: StringBuffer = StringBuffer()
     private var imgList: ArrayList<Uri> = ArrayList<Uri>()
@@ -51,9 +51,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private val selectedImageUris = mutableListOf<Uri>()
     private lateinit var imgListAdapter: AdapterImageList
     private val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-
     private val TAG = "ImageSelectionActivity"
-
     private lateinit var imgDataList: ArrayList<String>
     private var imgString: String = ""
 
@@ -95,15 +93,12 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
 
     private fun setImage(uriList: ArrayList<String>) {
-
-
         imgListAdapter = AdapterImageList(baseContext, this)
         imgListAdapter.updateImages(uriList)
         binding.rcvEditImages.setHasFixedSize(true)
-        binding.rcvEditImages.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.HORIZONTAL)
+        binding.rcvEditImages.layoutManager =
+            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL)
         binding.rcvEditImages.adapter = imgListAdapter
-
-
     }
 
     private fun initVars() {
@@ -114,7 +109,11 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
                 if (isGranted) {
                     openImagePicker()
                 } else {
-                    Toast.makeText(baseContext, "Permission denied. Cannot access images.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        baseContext,
+                        "Permission denied. Cannot access images.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -129,7 +128,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
             binding.edtNote.setText(oldNote?.description)
             oldNote?.let {
 
-                if (it.imageList.isNotEmpty()){
+                if (it.imageList.isNotEmpty()) {
                     imgDataList.addAll(listToString.stringToList(it.imageList))
                     binding.lytEditNoteImage.visibility = View.VISIBLE
                     setImage(imgDataList)
@@ -141,7 +140,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     }
 
     private fun initView() {
-
 
 
     }
@@ -161,12 +159,20 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
 
             if (editNote == true) {
-                newNote = Note(title, note, type, timeStamp, listToString.listToString(imgDataList), oldNote?.id!!)
+                newNote = Note(
+                    title,
+                    note,
+                    type,
+                    timeStamp,
+                    listToString.listToString(imgDataList),
+                    oldNote?.id!!
+                )
                 noteViewModel.updateNote(newNote!!)
                 baseContext.supportFragmentManager.popBackStackImmediate()
 
             } else {
-                newNote = Note(title, note, type, timeStamp, listToString.listToString(imgDataList), null)
+                newNote =
+                    Note(title, note, type, timeStamp, listToString.listToString(imgDataList), null)
                 baseContext.supportFragmentManager.popBackStackImmediate()
                 noteViewModel.addNote(newNote!!)
 
@@ -178,15 +184,21 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
 
     }
+
     private fun checkAndRequestPermission() {
         val permission = android.Manifest.permission.READ_EXTERNAL_STORAGE
-        if (ContextCompat.checkSelfPermission(baseContext, permission) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                baseContext,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             openImagePicker()
         } else {
             // Request the permission if not granted
             requestPermissionLauncher.launch(permission)
         }
     }
+
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -228,14 +240,19 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         }
 
     private val permissionsResultCallback = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()){
+        ActivityResultContracts.RequestPermission()
+    ) {
         when (it) {
-            true -> { println("Permission has been granted by user") }
+            true -> {
+                println("Permission has been granted by user")
+            }
+
             false -> {
                 Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
 
             }
-        }}
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -263,6 +280,11 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         changeToSaveIcon(true, this)
         changeIconToBack(true)
 
+//        if(imgDataList.isEmpty()){
+//            binding.rcvEditImages.visibility = View.GONE
+//        }else{
+//            binding.rcvEditImages.visibility = View.VISIBLE
+//        }
     }
 
     fun setInstance(editNote: Boolean, note: Note?): Fragment {
@@ -278,7 +300,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         changeToSaveIcon(false, this)
     }
 
-    
 
     override val getBindingLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragEditNoteBinding
         get() = FragEditNoteBinding::inflate

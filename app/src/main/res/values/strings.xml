@@ -17,4 +17,41 @@
     <string name="delete">Delete</string>
     <string name="client_server_id">970406457495-m8bl2jksge9vbe60417ua8j9jioqoa0k.apps.googleusercontent.com</string>
     <string name="note_content">Note Content</string>
+
+    <string name="set_reminder">Set reminder</string>
+    <string name="date">Date</string>
+    <string name="time">Select your time</string>
+    <string name="user_details">user_details</string>
+
+    <dimen name="very_very_small_text">9sp</dimen>
+    <dimen name="very_very_big_text">25sp</dimen>
+    <dimen name="information_img_height">180dp</dimen>
+    <dimen name="search_product_img_height">170dp</dimen>
+    <dimen name="month_product_img_height">200dp</dimen>
+    <dimen name="search_product_img_width">180dp</dimen>
+    <dimen name="recommed_product_img_height">200dp</dimen>
+    <dimen name="recommed_product_img_width">170dp</dimen>
+    <dimen name="tienda_detail_img_height">200dp</dimen>
+    <dimen name="tienda_product_img_width">120dp</dimen>
+    <dimen name="tienda_product_img_height">120dp</dimen>
+    <dimen name="gvd_item_spacing">5dp</dimen>
+    <dimen name="product_detail_profile_height">50dp</dimen>
+    <dimen name="product_detail_profile_width">50dp</dimen>
+    <dimen name="item_noticia_img_height">200dp</dimen>
+    <dimen name="margin_top_blogger">10dp</dimen>
+    <dimen name="blogger_appbar_height">150dp</dimen>
+    <dimen name="related_product_img_height">150dp</dimen>
+    <dimen name="related_product_img_width">120dp</dimen>
+    <dimen name="very_small_space">3dip</dimen>
+    <dimen name="very_small_space2">4dip</dimen>
+    <dimen name="small_space">5dip</dimen>
+    <dimen name="medium_space">7dip</dimen>
+    <dimen name="large_space">10dip</dimen>
+    <dimen name="large_space2">15dip</dimen>
+    <dimen name="very_large_space">20dip</dimen>
+    <dimen name="very_large_space2">23dip</dimen>
+    <dimen name="very_very_large_space">30dip</dimen>
+    <dimen name="very_very_large_space2">40dip</dimen>
+    <dimen name="very_very_very_large_space">50dip</dimen>
+    <dimen name="very_very_very_very_large_space">60dip</dimen>
 </resources>

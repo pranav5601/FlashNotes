@@ -25,4 +25,7 @@
     <color name="floating_btn_bg">#EEEEEE</color>
     <color name="transparent">#05FFFFFF</color>
 
+    <color name="light_grey">#cccccc</color>
+
+
 </resources>

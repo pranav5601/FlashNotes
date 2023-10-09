@@ -66,6 +66,13 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
         noteList.clear()
             noteViewModel.allNotes.observe(viewLifecycleOwner){
                 it?.let {
+                    if(it.isEmpty()){
+                        binding.notesRcv.visibility = View.GONE
+                        binding.txtNoNoteFound.visibility = View.VISIBLE
+                    }else{
+                        binding.notesRcv.visibility = View.VISIBLE
+                        binding.txtNoNoteFound.visibility = View.GONE
+                    }
                     noteList.addAll(it)
                     adapterNotes.updateList(it)
                 }

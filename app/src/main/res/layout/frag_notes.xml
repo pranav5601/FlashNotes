@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".fragments.FragNotes">
 
+    <TextView
+        android:id="@+id/txtNoNoteFound"
+        android:text="Please click the plus button to create your first note."
+        android:textColor="@color/grey_500"
+        android:gravity="center"
+        android:layout_margin="15dp"
+        android:textSize="@dimen/very_very_big_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notesRcv"
         tools:listitem="@layout/cell_note_list"
