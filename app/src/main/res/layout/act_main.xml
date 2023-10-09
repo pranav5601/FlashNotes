@@ -43,6 +43,7 @@
                         android:layout_height="48dp"
                         android:layout_marginEnd="5dp"
                         app:searchIcon="@null"
+
                         app:queryHint="@string/search_notes"
                         android:layout_weight="0.83"
                         app:iconifiedByDefault="false"
