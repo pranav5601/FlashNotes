@@ -1,7 +1,10 @@
 package com.nav.noteit.activities
 
+import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.Menu
+import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
@@ -9,14 +12,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.snackbar.Snackbar
 import com.nav.noteit.R
 import com.nav.noteit.databinding.ActMainBinding
 import com.nav.noteit.fragments.FragNotes
 import com.nav.noteit.fragments.FragReminders
 import com.nav.noteit.helper.Utils
-import com.nav.noteit.viewmodel.NoteViewModel
 import com.nav.noteit.viewmodel.SearchViewModel
-import org.koin.android.ext.android.inject
 
 
 class ActMain : ActBase() {
@@ -25,6 +27,7 @@ class ActMain : ActBase() {
     private lateinit var binding: ActMainBinding
     lateinit var menu: Menu
     private val searchViewModel: SearchViewModel by viewModels()
+    lateinit var snackBarReminder: Snackbar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +64,7 @@ class ActMain : ActBase() {
             }
         }
     }
+
 
 
     fun changeToSaveIcon(isShow: Boolean, clickListeners: ClickListeners?) {

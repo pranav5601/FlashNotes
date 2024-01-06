@@ -1,94 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_margin="15dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:padding="7dp"
-                android:weightSum="1"
-                android:orientation="horizontal"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lytTomorrowMorningReminder"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="7dp"
+                android:weightSum="1">
 
                 <ImageView
+                    android:id="@+id/alarmIcon1"
+                    android:layout_width="37dp"
+                    android:layout_height="37dp"
                     android:layout_weight="0"
                     android:src="@drawable/reminder_asset"
-                    android:layout_width="40dp"
                     app:tint="@color/menu_color"
-                    android:layout_height="40dp"/>
+                    tools:layout_editor_absoluteY="7dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
-                    android:paddingEnd="7dp"
-                    android:layout_weight="0.3"
-                    android:layout_marginStart="10dp"
+                    android:id="@+id/btnAlarmTomorrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:maxLines="1"
+                    android:layout_marginStart="15dp"
                     android:ellipsize="marquee"
-                    android:text="Add reminder"
-                    android:textSize="22sp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:text="Tomorrow"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toEndOf="@+id/alarmIcon1" />
 
                 <TextView
-                    android:layout_weight="0.7"
-                    android:text="8:00 PM"
-                    android:paddingStart="7dp"
-                    android:textSize="22sp"
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="end|center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_marginEnd="10dp"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:text="8:00 AM"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toEndOf="@+id/btnAlarmTomorrow"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
-                android:padding="7dp"
-                android:weightSum="1"
-                android:orientation="horizontal"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lytTomorrowEveningReminder"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="7dp"
+                android:weightSum="1">
 
                 <ImageView
+                    android:id="@+id/alarmIcon2"
+                    android:layout_width="37dp"
+                    android:layout_height="37dp"
                     android:layout_weight="0"
                     android:src="@drawable/reminder_asset"
-                    android:layout_width="40dp"
                     app:tint="@color/menu_color"
-                    android:layout_height="40dp"/>
+                    tools:layout_editor_absoluteY="7dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
-                    android:paddingEnd="7dp"
-                    android:layout_weight="0.3"
-                    android:layout_marginStart="10dp"
+                    android:id="@+id/btnAlarmTomorrowEve"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:maxLines="1"
+                    android:layout_marginStart="15dp"
                     android:ellipsize="marquee"
-                    android:text="Add reminder"
-                    android:textSize="22sp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:text="Tomorrow Evening"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toEndOf="@+id/alarmIcon2" />
 
                 <TextView
-                    android:layout_weight="0.7"
-                    android:text="8:00 PM"
-                    android:paddingStart="7dp"
-                    android:textSize="22sp"
+                    android:id="@+id/txtEveTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="end|center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_marginEnd="10dp"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:text="6:00 PM"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toEndOf="@+id/btnAlarmTomorrowEve"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lytAddCustomReminder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="7dp"
+                android:weightSum="1">
 
+                <ImageView
+                    android:id="@+id/alarmIcon3"
+                    android:layout_width="37dp"
+                    android:layout_height="37dp"
+                    android:layout_weight="0"
+                    android:src="@drawable/reminder_asset"
+                    app:tint="@color/menu_color"
+                    tools:layout_editor_absoluteY="7dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/btnReminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15dp"
+                    android:ellipsize="marquee"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:text="Pick your own time"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toEndOf="@+id/alarmIcon3" />
+
+                <TextView
+                    android:id="@+id/txtCustomTimeReminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center"
+                    android:layout_marginEnd="10dp"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:visibility="gone"
+                    android:text="8:00 PM"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toEndOf="@+id/btnReminder"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 

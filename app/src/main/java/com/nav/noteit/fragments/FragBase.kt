@@ -34,6 +34,9 @@ abstract class FragBase<T : ViewBinding> : Fragment() {
         }
 
     }
+
+
+
     fun selectMenuDrawer() {
 
         if (baseContext is ActMain) {

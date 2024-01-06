@@ -4,15 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
@@ -20,6 +20,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.snackbar.Snackbar.SnackbarLayout
+import com.nav.noteit.R
 import com.nav.noteit.activities.ActMain
 import com.nav.noteit.adapters.AdapterImageList
 import com.nav.noteit.databinding.FragEditNoteBinding
@@ -28,10 +31,8 @@ import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.room_models.Note
 import com.nav.noteit.viewmodel.NoteViewModel
 import org.koin.android.ext.android.inject
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
-import kotlin.math.floor
+import android.view.MotionEvent
+import android.widget.TextView
 
 
 class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
@@ -54,6 +55,21 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private val TAG = "ImageSelectionActivity"
     private lateinit var imgDataList: ArrayList<String>
     private var imgString: String = ""
+    private var clicked = false
+
+    //animation
+    private val expandFab: Animation by lazy {
+        AnimationUtils.loadAnimation(
+            baseContext,
+            R.anim.fab_expand_from_bottom
+        )
+    }
+    private val shrinkFab: Animation by lazy {
+        AnimationUtils.loadAnimation(
+            baseContext,
+            R.anim.fab_shrink_from_top
+        )
+    }
 
     override fun setUpFrag() {
 
@@ -72,7 +88,17 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     }
 
     private fun initClick() {
-        binding.fabAddPhotos.setOnClickListener {
+
+        binding.btnAddItems.setOnClickListener {
+            openSubFab()
+
+        }
+
+        binding.btnCreateReminder.setOnClickListener {
+            openSnackBarForReminder(it)
+        }
+
+        binding.btnAddImages.setOnClickListener {
 
             if (isPhotoPickerAvailable()) {
 
@@ -81,6 +107,65 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
                 checkAndRequestPermission()
             }
 
+        }
+        binding.windowBlurBg.setOnClickListener {
+            
+        }
+    }
+
+
+    private fun openSnackBarForReminder(view: View) {
+        val snackBarReminder = Snackbar.make(view, "", Snackbar.LENGTH_INDEFINITE)
+        openSubFab()
+        val customView = layoutInflater.inflate(R.layout.cell_reminder_snackbar, null)
+
+        snackbarInternalClick(customView)
+        snackBarReminder.view.setBackgroundColor(Color.TRANSPARENT)
+        val snackbarLayout: SnackbarLayout = snackBarReminder.view as Snackbar.SnackbarLayout
+        snackbarLayout.setPadding(0, 0, 0, 0)
+        snackbarLayout.addView(customView, 0)
+        snackBarReminder.show()
+    }
+
+
+    private fun snackbarInternalClick(customView: View?) {
+           val tctCustomReminder =  customView?.findViewById<TextView>(R.id.txtCustomTimeReminder)
+
+    }
+
+
+    private fun openSubFab() {
+        setVisibility(clicked)
+        showBlurBg(!clicked)
+        setAnimation(clicked)
+        clicked = !clicked
+    }
+
+    fun showBlurBg(setVisible: Boolean){
+
+        binding.windowBlurBg.visibility = if(setVisible) View.VISIBLE else View.GONE
+    }
+
+    private fun setAnimation(clicked: Boolean) {
+        if (!clicked) {
+            binding.btnAddImages.startAnimation(expandFab)
+            binding.btnCreateReminder.startAnimation(expandFab)
+
+        } else {
+            binding.btnAddImages.startAnimation(shrinkFab)
+            binding.btnCreateReminder.startAnimation(shrinkFab)
+
+        }
+
+    }
+
+    private fun setVisibility(clicked: Boolean) {
+        if (!clicked) {
+            binding.btnAddImages.visibility = View.VISIBLE
+            binding.btnCreateReminder.visibility = View.VISIBLE
+        } else {
+            binding.btnAddImages.visibility = View.GONE
+            binding.btnCreateReminder.visibility = View.GONE
         }
     }
 
@@ -128,7 +213,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
             binding.edtNote.setText(oldNote?.description)
             oldNote?.let {
 
-                if (it.imageList.isNotEmpty()) {
+                if (it.imageList.length > 2) {
                     imgDataList.addAll(listToString.stringToList(it.imageList))
                     binding.lytEditNoteImage.visibility = View.VISIBLE
                     setImage(imgDataList)
