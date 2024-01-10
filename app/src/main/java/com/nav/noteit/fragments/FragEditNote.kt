@@ -1,5 +1,6 @@
 package com.nav.noteit.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -20,7 +21,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.nav.noteit.R
 import com.nav.noteit.activities.ActMain
@@ -31,8 +31,8 @@ import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.room_models.Note
 import com.nav.noteit.viewmodel.NoteViewModel
 import org.koin.android.ext.android.inject
-import android.view.MotionEvent
 import android.widget.TextView
+import com.google.android.material.snackbar.Snackbar
 
 
 class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
@@ -69,6 +69,11 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
             baseContext,
             R.anim.fab_shrink_from_top
         )
+    }
+
+    companion object {
+        lateinit var snackBarReminder: Snackbar
+        var toHideBgLayout: Boolean = false    //true for snackBar layout and false for floating button
     }
 
     override fun setUpFrag() {
@@ -109,28 +114,47 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         }
         binding.windowBlurBg.setOnClickListener {
-            
+
+
+            if (toHideBgLayout && snackBarReminder.isShown) {
+                it.visibility = View.GONE
+                snackBarReminder.dismiss()
+            }else{
+                openSubFab()
+            }
+
+
         }
     }
 
 
+    @SuppressLint("RestrictedApi")
     private fun openSnackBarForReminder(view: View) {
-        val snackBarReminder = Snackbar.make(view, "", Snackbar.LENGTH_INDEFINITE)
+
+        snackBarReminder = Snackbar.make(view, "", Snackbar.LENGTH_INDEFINITE)
         openSubFab()
         val customView = layoutInflater.inflate(R.layout.cell_reminder_snackbar, null)
-
         snackbarInternalClick(customView)
         snackBarReminder.view.setBackgroundColor(Color.TRANSPARENT)
-        val snackbarLayout: SnackbarLayout = snackBarReminder.view as Snackbar.SnackbarLayout
-        snackbarLayout.setPadding(0, 0, 0, 0)
+        val snackbarLayout: SnackbarLayout = snackBarReminder.view as SnackbarLayout
+        snackbarLayout.setPadding(2, 2, 2, 2)
         snackbarLayout.addView(customView, 0)
-        snackBarReminder.show()
+        showBlurBg(!clicked)
+        setSnackbarVisibility(snackBarReminder)
     }
 
+    private fun setSnackbarVisibility(snackBarReminder: Snackbar) {
+        if (!snackBarReminder.isShown) {
+            toHideBgLayout = true
+            snackBarReminder.show()
+        }
+    }
 
     private fun snackbarInternalClick(customView: View?) {
-           val tctCustomReminder =  customView?.findViewById<TextView>(R.id.txtCustomTimeReminder)
-
+        val tctCustomReminder = customView?.findViewById<TextView>(R.id.txtCustomTimeReminder)
+        tctCustomReminder?.setOnClickListener {
+            Toast.makeText(baseContext, "Clicked", Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -141,9 +165,9 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         clicked = !clicked
     }
 
-    fun showBlurBg(setVisible: Boolean){
+    private fun showBlurBg(setVisible: Boolean) {
 
-        binding.windowBlurBg.visibility = if(setVisible) View.VISIBLE else View.GONE
+        binding.windowBlurBg.visibility = if (setVisible) View.VISIBLE else View.GONE
     }
 
     private fun setAnimation(clicked: Boolean) {
@@ -172,7 +196,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private fun showImagePicker() {
 
         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
 
     }
 
@@ -381,6 +404,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
     override fun onDetach() {
         super.onDetach()
+
         changeIconToBack(false)
         changeToSaveIcon(false, this)
     }

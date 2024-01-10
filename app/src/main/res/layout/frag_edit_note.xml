@@ -12,12 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
-            android:id="@+id/window_blur_bg"
-            android:visibility="gone"
-            android:background="@drawable/window_blur_backgound"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+
 
         <LinearLayout
             android:orientation="vertical"
@@ -105,7 +100,14 @@
                 </LinearLayout>
             </ScrollView>
         </LinearLayout>
-
+        <View
+            android:id="@+id/window_blur_bg"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/window_blur_backgound"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </FrameLayout>
 
 
