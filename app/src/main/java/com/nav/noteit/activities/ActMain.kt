@@ -3,6 +3,7 @@ package com.nav.noteit.activities
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MotionEvent
 import android.view.View
@@ -202,6 +203,17 @@ class ActMain : ActBase() {
 
         }
 
+
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.e("ActMain","onRestart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.e("ActMain","onResume")
 
     }
 

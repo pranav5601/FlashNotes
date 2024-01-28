@@ -2,37 +2,53 @@ package com.nav.noteit.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.nav.noteit.R
 import com.nav.noteit.activities.ActMain
 import com.nav.noteit.adapters.AdapterImageList
+import com.nav.noteit.adapters.ReminderViewPagerAdapter
 import com.nav.noteit.databinding.FragEditNoteBinding
 import com.nav.noteit.helper.Constants
 import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.room_models.Note
 import com.nav.noteit.viewmodel.NoteViewModel
+import com.nav.noteit.viewmodel.ReminderViewModel
 import org.koin.android.ext.android.inject
-import android.widget.TextView
-import com.google.android.material.snackbar.Snackbar
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
@@ -43,11 +59,9 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private var editNote: Boolean? = false
     private val noteViewModel by inject<NoteViewModel>()
     private val listToString by inject<ListToStringTypeConverter>()
-    lateinit var noteTitle: String
+    private val reminderViewModel by inject<ReminderViewModel>()
     private var finalString: StringBuffer = StringBuffer()
-    private var imgList: ArrayList<Uri> = ArrayList<Uri>()
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
-    private val REQUEST_CODE_OPEN_DOCUMENT = 100
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val selectedImageUris = mutableListOf<Uri>()
     private lateinit var imgListAdapter: AdapterImageList
@@ -56,6 +70,9 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private lateinit var imgDataList: ArrayList<String>
     private var imgString: String = ""
     private var clicked = false
+    private var backPressedTime: Long = 0
+    private lateinit var reminderDialog: Dialog
+
 
     //animation
     private val expandFab: Animation by lazy {
@@ -73,7 +90,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
     companion object {
         lateinit var snackBarReminder: Snackbar
-        var toHideBgLayout: Boolean = false    //true for snackBar layout and false for floating button
+        var toHideBgLayout: Boolean =
+            false    //true for snackBar layout and false for floating button
     }
 
     override fun setUpFrag() {
@@ -119,10 +137,9 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
             if (toHideBgLayout && snackBarReminder.isShown) {
                 it.visibility = View.GONE
                 snackBarReminder.dismiss()
-            }else{
+            } else {
                 openSubFab()
             }
-
 
         }
     }
@@ -133,10 +150,11 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         snackBarReminder = Snackbar.make(view, "", Snackbar.LENGTH_INDEFINITE)
         openSubFab()
-        val customView = layoutInflater.inflate(R.layout.cell_reminder_snackbar, null)
-        snackbarInternalClick(customView)
+        val customView = layoutInflater.inflate(R.layout.cell_reminder_snackbar, null) as ViewGroup
         snackBarReminder.view.setBackgroundColor(Color.TRANSPARENT)
         val snackbarLayout: SnackbarLayout = snackBarReminder.view as SnackbarLayout
+        snackbarInternalClick(customView)
+
         snackbarLayout.setPadding(2, 2, 2, 2)
         snackbarLayout.addView(customView, 0)
         showBlurBg(!clicked)
@@ -150,13 +168,117 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         }
     }
 
-    private fun snackbarInternalClick(customView: View?) {
-        val tctCustomReminder = customView?.findViewById<TextView>(R.id.txtCustomTimeReminder)
-        tctCustomReminder?.setOnClickListener {
+    private fun snackbarInternalClick(customView: ViewGroup) {
+        val txtTomorrowReminder: ConstraintLayout =
+            customView.findViewById(R.id.lytTomorrowMorningReminder)
+        val btnCustomReminder: ConstraintLayout = customView.findViewById(R.id.lytAddCustomReminder)
+        val txtCustomReminder: TextView = customView.findViewById(R.id.txtReminder)
+        txtTomorrowReminder.setOnClickListener {
             Toast.makeText(baseContext, "Clicked", Toast.LENGTH_SHORT).show()
+
+        }
+
+        btnCustomReminder.setOnClickListener {
+
+            openReminderDialogueBox()
+
+            /*val reminderDatePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Pick a time")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setPositiveButtonText("Submit")
+                .build()
+            openCalender(reminderDatePicker, txtCustomReminder)*/
+        }
+
+
+    }
+
+    private fun openReminderDialogueBox() {
+
+        setDialogBox()
+
+
+    }
+
+    private fun setDialogBox() {
+        reminderDialog = Dialog(baseContext)
+        reminderDialog.setContentView(layoutInflater.inflate(R.layout.reminder_alert_box, null))
+
+        val displayMetrics = DisplayMetrics()
+
+        baseContext.windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+        val width = displayMetrics.widthPixels
+        val reducedWidth = (width * 9) / 100
+
+        reminderDialog.window?.setLayout(
+            width - reducedWidth.toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        reminderDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        reminderDialog.show()
+
+        setViewPager(reminderDialog)
+        setUpClicks(reminderDialog)
+    }
+
+    private fun setUpClicks(reminderDialog: Dialog) {
+        val btnCancel: TextView = reminderDialog.findViewById(R.id.btnCancel)
+        val btnSave: Button = reminderDialog.findViewById(R.id.btnSaveReminder)
+
+        btnCancel.setOnClickListener {
+            reminderDialog.dismiss()
+        }
+
+        btnSave.setOnClickListener {
+
+            val btnPressed = Intent("click").apply { putExtra("clicked",true) }
+            LocalBroadcastManager.getInstance(baseContext).sendBroadcast(btnPressed)
+            reminderDialog.dismiss()
+
         }
     }
 
+    private fun setViewPager(reminderDialog: Dialog) {
+
+        val reminderViewPager = reminderDialog.findViewById<ViewPager2>(R.id.reminderViewPager)
+        val reminderTabLayout = reminderDialog.findViewById<TabLayout>(R.id.reminderTabLayout)
+
+        val viewPagerAdapter = ReminderViewPagerAdapter(baseContext, 0)
+
+        reminderViewPager.adapter = viewPagerAdapter
+
+        TabLayoutMediator(reminderTabLayout, reminderViewPager) { tab, pos ->
+
+            val tabNames = listOf("Date/Time", "Location")
+            tab.text = tabNames[pos]
+
+        }.attach()
+
+    }
+
+    private fun openCalender(
+        reminderDatePicker: MaterialDatePicker<Long>,
+        txtCustomReminder: TextView
+    ) {
+
+        reminderDatePicker.addOnPositiveButtonClickListener { timeMillis ->
+            Toast.makeText(baseContext, "Reminder is set.", Toast.LENGTH_SHORT).show()
+
+            val date = Date(timeMillis)
+            val simpleDateFormat = SimpleDateFormat("EE, dd MM yyyy", Locale.getDefault())
+            val formattedDate = simpleDateFormat.format(date)
+            txtCustomReminder.text = formattedDate
+        }
+        reminderDatePicker.addOnNegativeButtonClickListener {
+            Toast.makeText(baseContext, "Reminder Cancelled", Toast.LENGTH_SHORT).show()
+        }
+
+        reminderDatePicker.show(baseContext.supportFragmentManager, "Reminder DatePicker")
+
+    }
 
     private fun openSubFab() {
         setVisibility(clicked)
@@ -168,6 +290,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private fun showBlurBg(setVisible: Boolean) {
 
         binding.windowBlurBg.visibility = if (setVisible) View.VISIBLE else View.GONE
+
     }
 
     private fun setAnimation(clicked: Boolean) {
@@ -248,8 +371,41 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     }
 
     private fun initView() {
+        val rootView = binding.root
+        initBackClick(rootView)
+    }
 
+    private fun initBackClick(rootView: View) {
+        rootView.isFocusableInTouchMode = true
+        rootView.requestFocus()
+        rootView.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+                handleBackButtonPress()
+                return@OnKeyListener true
+            }
+            false
+        })
+    }
 
+    private fun handleBackButtonPress() {
+        if (toHideBgLayout && snackBarReminder.isShown) {
+            snackBarReminder.dismiss()
+        } else {
+
+            baseContext.supportFragmentManager.popBackStack()
+        }
+    }
+
+    private fun handleFragmentBackNavigation() {
+        // Implement your fragment back navigation logic here
+        if (System.currentTimeMillis() - backPressedTime > 2000) {
+            // Example: Display a toast message
+            // Toast.makeText(requireContext(), "Press back again to exit", Toast.LENGTH_SHORT).show()
+            backPressedTime = System.currentTimeMillis()
+        } else {
+            // Example: Navigate back
+
+        }
     }
 
 
@@ -290,7 +446,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
             Log.e("Error", "Cannot store empty note.")
         }
 
-
     }
 
     private fun checkAndRequestPermission() {
@@ -312,7 +467,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-
         imagePickerLauncher.launch(intent)
     }
 
@@ -343,6 +497,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
                     selectedImageUris.forEach { uri ->
                         Log.i(TAG, uri.path!!)
                     }
+                    openSubFab()
                 }
             }
         }
@@ -405,6 +560,9 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     override fun onDetach() {
         super.onDetach()
 
+        if (toHideBgLayout && snackBarReminder.isShown) {
+            snackBarReminder.dismiss()
+        }
         changeIconToBack(false)
         changeToSaveIcon(false, this)
     }
@@ -420,8 +578,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     }
 
     override fun onSaveBtnClick() {
-
-
         insertNote()
         Log.e("image list in string", listToString.listToString(imgDataList))
     }
@@ -435,3 +591,5 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     }
 
 }
+
+

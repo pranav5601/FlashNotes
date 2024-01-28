@@ -22,6 +22,7 @@
     <string name="date">Date</string>
     <string name="time">Select your time</string>
     <string name="user_details">user_details</string>
+    <string name="set_reminder_tomorrow_morning">set reminder tomorrow morning</string>
 
     <dimen name="very_very_small_text">9sp</dimen>
     <dimen name="very_very_big_text">25sp</dimen>

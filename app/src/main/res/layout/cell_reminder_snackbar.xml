@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_margin="15dp"
     android:layout_height="match_parent"
+    android:layout_margin="15dp"
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
@@ -14,6 +14,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,23 +27,25 @@
 
                 <ImageView
                     android:id="@+id/alarmIcon1"
-                    android:layout_width="37dp"
-                    android:layout_height="37dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_weight="0"
+                    android:contentDescription="@string/set_reminder_tomorrow_morning"
                     android:src="@drawable/reminder_asset"
-                    app:tint="@color/menu_color"
-                    tools:layout_editor_absoluteY="7dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.5"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:tint="@color/menu_color"
+                    tools:layout_editor_absoluteY="7dp" />
 
                 <TextView
                     android:id="@+id/btnAlarmTomorrow"
+                    style="@style/reminder_alert_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="10dp"
                     android:ellipsize="marquee"
                     android:gravity="center_vertical"
                     android:maxLines="1"
@@ -50,14 +53,15 @@
                     android:paddingEnd="7dp"
                     android:text="Tomorrow"
                     android:textSize="20sp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.5"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toEndOf="@+id/alarmIcon1" />
+                    app:layout_constraintStart_toEndOf="@+id/alarmIcon1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
 
                 <TextView
                     android:id="@+id/textView"
+                    style="@style/reminder_alert_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|center"
@@ -66,11 +70,11 @@
                     android:paddingEnd="7dp"
                     android:text="8:00 AM"
                     android:textSize="20sp"
-                    app:layout_constraintStart_toEndOf="@+id/btnAlarmTomorrow"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintStart_toEndOf="@+id/btnAlarmTomorrow"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -84,23 +88,24 @@
 
                 <ImageView
                     android:id="@+id/alarmIcon2"
-                    android:layout_width="37dp"
-                    android:layout_height="37dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_weight="0"
                     android:src="@drawable/reminder_asset"
-                    app:tint="@color/menu_color"
-                    tools:layout_editor_absoluteY="7dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.5"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:tint="@color/menu_color"
+                    tools:layout_editor_absoluteY="7dp" />
 
                 <TextView
                     android:id="@+id/btnAlarmTomorrowEve"
+                    style="@style/reminder_alert_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="10dp"
                     android:ellipsize="marquee"
                     android:gravity="center_vertical"
                     android:maxLines="1"
@@ -108,14 +113,15 @@
                     android:paddingEnd="7dp"
                     android:text="Tomorrow Evening"
                     android:textSize="20sp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.5"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toEndOf="@+id/alarmIcon2" />
+                    app:layout_constraintStart_toEndOf="@+id/alarmIcon2"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
 
                 <TextView
                     android:id="@+id/txtEveTime"
+                    style="@style/reminder_alert_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|center"
@@ -124,11 +130,11 @@
                     android:paddingEnd="7dp"
                     android:text="6:00 PM"
                     android:textSize="20sp"
-                    app:layout_constraintStart_toEndOf="@+id/btnAlarmTomorrowEve"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintStart_toEndOf="@+id/btnAlarmTomorrowEve"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -136,29 +142,33 @@
                 android:id="@+id/lytAddCustomReminder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/btn_ripple"
+                android:clickable="true"
+                android:focusable="true"
                 android:orientation="horizontal"
                 android:padding="7dp"
                 android:weightSum="1">
 
                 <ImageView
                     android:id="@+id/alarmIcon3"
-                    android:layout_width="37dp"
-                    android:layout_height="37dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_weight="0"
                     android:src="@drawable/reminder_asset"
-                    app:tint="@color/menu_color"
-                    tools:layout_editor_absoluteY="7dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.5"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:tint="@color/menu_color"
+                    tools:layout_editor_absoluteY="7dp" />
 
                 <TextView
-                    android:id="@+id/btnReminder"
+                    android:id="@+id/txtReminder"
+                    style="@style/reminder_alert_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="10dp"
                     android:ellipsize="marquee"
                     android:gravity="center_vertical"
                     android:maxLines="1"
@@ -166,11 +176,11 @@
                     android:paddingEnd="7dp"
                     android:text="Pick your own time"
                     android:textSize="20sp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.5"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toEndOf="@+id/alarmIcon3" />
+                    app:layout_constraintStart_toEndOf="@+id/alarmIcon3"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5" />
 
                 <TextView
                     android:id="@+id/txtCustomTimeReminder"
@@ -180,14 +190,14 @@
                     android:layout_marginEnd="10dp"
                     android:paddingStart="7dp"
                     android:paddingEnd="7dp"
-                    android:visibility="gone"
                     android:text="8:00 PM"
                     android:textSize="20sp"
-                    app:layout_constraintStart_toEndOf="@+id/btnReminder"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintStart_toEndOf="@+id/txtReminder"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

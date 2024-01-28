@@ -24,8 +24,12 @@
     <color name="appbar_bg">#FFFFFF</color>
     <color name="floating_btn_bg">#EEEEEE</color>
     <color name="transparent">#05FFFFFF</color>
-
+    <color name="reminder_alert_bg">#FFFFFF</color>
     <color name="light_grey">#cccccc</color>
+    <color name="reminder_selected_text">#A4ADE9</color>
+    <color name="blue_400">#64b5f6</color>
+    <color name="blue_600">#2196f3</color>
+
 
 
 </resources>

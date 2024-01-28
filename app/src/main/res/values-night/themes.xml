@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.NoteIt" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -8,7 +8,7 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/grey_700</item>
         <item name="colorSecondaryVariant">@color/grey_500</item>
-        <item name="colorOnSecondary">@color/yellow_400</item>
+        <item name="colorOnSecondary">@color/purple_200</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/grey_900</item>
         <!-- Customize your theme here. -->
@@ -17,20 +17,30 @@
         <item name="android:textColorPrimary">@color/txt_color</item>
         <item name="appBarLayoutStyle">@style/appBarStyle</item>
 
-        <item name="colorAccent">@color/yellow_400</item>
+<!--        <item name="colorAccent">@color/yellow_400</item>-->
 
     </style>
 
     <style name="fab_square_shape">
-    <item name="shapeCornerFamily">cut</item>
-    <item name="cornerSizeTopLeft">10dp</item>
-    <item name="cornerSizeTopRight">10dp</item>
-    <item name="cornerSizeBottomLeft">10dp</item>
-    <item name="cornerSizeBottomRight">10dp</item>
+        <item name="shapeCornerFamily">cut</item>
+        <item name="cornerSizeTopLeft">10dp</item>
+        <item name="cornerSizeTopRight">10dp</item>
+        <item name="cornerSizeBottomLeft">10dp</item>
+        <item name="cornerSizeBottomRight">10dp</item>
     </style>
+
+    <style name="reminder_alert_text">
+        <item name="android:textColor">@color/txt_color</item>
+    </style>
+
+    <style name="reminder_cancel_btn">
+        <item name="android:textColor">@color/purple_200</item>
+    </style>
+
     <style name="appBarStyle">
         <item name="backgroundColor">@color/grey_900</item>
     </style>
+
     <style name="divider">
         <item name="android:layout_height">1dp</item>
         <item name="android:layout_width">match_parent</item>

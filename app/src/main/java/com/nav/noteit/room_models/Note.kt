@@ -18,3 +18,8 @@ class Note(
 
 )
 
+class Reminder(
+    @ColumnInfo(name = "reminder_time") val reminderTime: String,
+    @ColumnInfo(name = "reminder_time") val reminderDate: String,
+    @ColumnInfo(name = "reminder_time") val reminderRepetition: String,
+)

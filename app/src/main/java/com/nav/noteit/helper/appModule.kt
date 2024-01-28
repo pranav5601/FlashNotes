@@ -6,6 +6,7 @@ import com.nav.noteit.database.NoteDatabase
 import com.nav.noteit.repositories.NoteRepo
 import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.viewmodel.NoteViewModel
+import com.nav.noteit.viewmodel.ReminderViewModel
 import com.nav.noteit.viewmodel.SearchViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -30,6 +31,9 @@ val appModule = module{
         ListToStringTypeConverter()
     }
 
+    viewModel{
+        ReminderViewModel()
+    }
 
 
 

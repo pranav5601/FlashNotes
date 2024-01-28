@@ -1,5 +1,7 @@
 package com.nav.noteit.fragments
 
+import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -43,6 +45,17 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
         initClick()
         filterNote()
 
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.e(FragNotes().tag, "onStart")
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.e(FragNotes().tag, "onAttach")
 
     }
 
@@ -101,16 +114,15 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
 
     private fun initClick() {
         binding.btnCreateAction.setOnClickListener {
-            openSubFab()
+            changeIconToBack(true)
+//            openSubFab()
+            Utils.addFrag(baseContext.supportFragmentManager,R.id.mainFragContainer, FragEditNote(), R.anim.slide_in_top, R.anim.slide_out_top, R.anim.slide_in_bottom, R.anim.slide_out_bottom)
 
         }
 
         binding.btnCreateNotes.setOnClickListener{
 
 
-            changeIconToBack(true)
-            openSubFab()
-            Utils.addFrag(baseContext.supportFragmentManager,R.id.mainFragContainer, FragEditNote(), R.anim.slide_in_top, R.anim.slide_out_top, R.anim.slide_in_bottom, R.anim.slide_out_bottom)
 
         }
 
