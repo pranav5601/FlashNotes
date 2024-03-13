@@ -1,20 +1,22 @@
 package com.nav.noteit.database
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.nav.noteit.dao.NoteDao
+import com.nav.noteit.dao.ReminderDao
+import com.nav.noteit.databaseRelations.NoteWithReminderDao
 import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.room_models.Note
+import com.nav.noteit.room_models.Reminder
 
-@Database(entities = [Note::class], version = 2, exportSchema = false)
+@Database(entities = [Note::class, Reminder::class], version = 6, exportSchema = false)
 @TypeConverters(ListToStringTypeConverter::class)
-abstract class NoteDatabase : RoomDatabase(){
+abstract class NoteDatabase : RoomDatabase() {
 
     abstract fun getNoteDao(): NoteDao
+    abstract fun getReminderDao(): ReminderDao
+    abstract fun getNoteWithReminderDao(): NoteWithReminderDao
 
     /*companion object {
         @Volatile

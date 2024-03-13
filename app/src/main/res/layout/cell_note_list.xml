@@ -73,12 +73,12 @@
 
             <com.google.android.material.imageview.ShapeableImageView
 
-                android:id="@+id/imgNoteType"
+                android:id="@+id/imgNoteReminder"
                 android:layout_width="0dp"
-                android:layout_height="15dp"
+                android:layout_height="18dp"
                 android:layout_gravity="center"
                 android:layout_weight="0.1"
-                android:src="@drawable/note_it_logo" />
+                android:src="@drawable/bell" />
 
         </LinearLayout>
 

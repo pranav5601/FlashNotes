@@ -3,28 +3,35 @@ package com.nav.noteit.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nav.noteit.repositories.ReminderRepo
+import com.nav.noteit.room_models.Reminder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class ReminderViewModel():ViewModel() {
+class ReminderViewModel(private val reminderRepo: ReminderRepo):ViewModel() {
 
     private val reminderTime = MutableLiveData<String>()
     private val reminderDate = MutableLiveData<String>()
     private val reminderRepetition = MutableLiveData<String>()
+    private val reminder = MutableLiveData<Reminder>()
 
 
-    val selectedTime: LiveData<String> = reminderTime
-    val selectedDate: LiveData<String> = reminderDate
-    val selectedRepetition: LiveData<String> = reminderRepetition
 
-    fun selectedTime(time: String){
-        reminderTime.value = time
+
+    fun insertReminder(reminder: Reminder) = viewModelScope.launch (Dispatchers.IO){
+        reminderRepo.insertReminder(reminder)
     }
 
-    fun selectedDate(date: String){
-        reminderDate.value = date
+    fun updateReminder(reminder: Reminder) = viewModelScope.launch(Dispatchers.IO) {
+        reminderRepo.updateReminder(reminder)
     }
 
-    fun selectedRepetition(repetition: String){
-        reminderRepetition.value = repetition
+    fun deleteReminder(reminder: Reminder?) = viewModelScope.launch(Dispatchers.IO) {
+        reminderRepo.deleteReminder(reminder)
     }
+
+
+
 
 }

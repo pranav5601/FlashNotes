@@ -2,9 +2,15 @@ package com.nav.noteit.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlarmManager
 import android.app.Dialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -30,30 +36,37 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.gson.Gson
 import com.nav.noteit.R
 import com.nav.noteit.activities.ActMain
 import com.nav.noteit.adapters.AdapterImageList
 import com.nav.noteit.adapters.ReminderViewPagerAdapter
+import com.nav.noteit.databaseRelations.NoteWithReminder
 import com.nav.noteit.databinding.FragEditNoteBinding
 import com.nav.noteit.helper.Constants
+import com.nav.noteit.helper.ReminderManager
+import com.nav.noteit.helper.Utils
+import com.nav.noteit.models.AlarmItem
 import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.room_models.Note
+import com.nav.noteit.room_models.Reminder
 import com.nav.noteit.viewmodel.NoteViewModel
+import com.nav.noteit.viewmodel.ReminderAlarmViewModel
 import com.nav.noteit.viewmodel.ReminderViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     AdapterImageList.ImageClickListener {
 
+    private lateinit var mNotificationManager: NotificationManager
+    private var reminderId: Int? = null
     private var newNote: Note? = null
     private var oldNote: Note? = null
     private var editNote: Boolean? = false
@@ -72,6 +85,14 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private var clicked = false
     private var backPressedTime: Long = 0
     private lateinit var reminderDialog: Dialog
+    private var noteId: Int = 0
+    private var reminderData: Reminder? = null
+    private lateinit var reminderBroadcastReceiver: BroadcastReceiver
+    private lateinit var intentFilter: IntentFilter
+    private var reminderAlarmManager: AlarmManager? = null
+    private lateinit var alarmPendingIntent: PendingIntent
+    private var isAlarmSet: Boolean = false
+    private val alarmReminderViewModel by inject<ReminderAlarmViewModel> ()
 
 
     //animation
@@ -100,7 +121,28 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         initView()
         initClick()
         setData()
+        receiveBroadcast()
 
+    }
+
+    private fun receiveBroadcast() {
+        intentFilter = IntentFilter().apply {
+            addAction("send_data")
+        }
+
+        reminderBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                reminderData =
+                    Gson().fromJson(intent?.getStringExtra("reminder_data"), Reminder::class.java)
+//                Log.e("reminderData", reminderData.toString())
+                LocalBroadcastManager.getInstance(baseContext)
+                    .unregisterReceiver(reminderBroadcastReceiver)
+            }
+
+        }
+
+        LocalBroadcastManager.getInstance(baseContext)
+            .registerReceiver(reminderBroadcastReceiver, intentFilter)
     }
 
 
@@ -234,8 +276,15 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         btnSave.setOnClickListener {
 
-            val btnPressed = Intent("click").apply { putExtra("clicked",true) }
+            val btnPressed = Intent("click").apply {
+                putExtra("clicked", noteId)
+                if (isAlarmSet){
+                    putExtra("reminder_id", reminderId)
+                }
+            }
             LocalBroadcastManager.getInstance(baseContext).sendBroadcast(btnPressed)
+
+
             reminderDialog.dismiss()
 
         }
@@ -246,7 +295,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         val reminderViewPager = reminderDialog.findViewById<ViewPager2>(R.id.reminderViewPager)
         val reminderTabLayout = reminderDialog.findViewById<TabLayout>(R.id.reminderTabLayout)
 
-        val viewPagerAdapter = ReminderViewPagerAdapter(baseContext, 0)
+        val viewPagerAdapter = ReminderViewPagerAdapter(baseContext, 0, reminderData)
 
         reminderViewPager.adapter = viewPagerAdapter
 
@@ -259,26 +308,6 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
     }
 
-    private fun openCalender(
-        reminderDatePicker: MaterialDatePicker<Long>,
-        txtCustomReminder: TextView
-    ) {
-
-        reminderDatePicker.addOnPositiveButtonClickListener { timeMillis ->
-            Toast.makeText(baseContext, "Reminder is set.", Toast.LENGTH_SHORT).show()
-
-            val date = Date(timeMillis)
-            val simpleDateFormat = SimpleDateFormat("EE, dd MM yyyy", Locale.getDefault())
-            val formattedDate = simpleDateFormat.format(date)
-            txtCustomReminder.text = formattedDate
-        }
-        reminderDatePicker.addOnNegativeButtonClickListener {
-            Toast.makeText(baseContext, "Reminder Cancelled", Toast.LENGTH_SHORT).show()
-        }
-
-        reminderDatePicker.show(baseContext.supportFragmentManager, "Reminder DatePicker")
-
-    }
 
     private fun openSubFab() {
         setVisibility(clicked)
@@ -334,6 +363,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
     private fun initVars() {
 
+        mNotificationManager =  baseContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         imgDataList = ArrayList<String>()
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -354,6 +384,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         if (oldNote != null) {
             finalString.append(oldNote?.description!!)
+            isAlarmSet = oldNote?.isReminderSet!!
+            oldNote?.let { noteId = it.noteId }
 
             binding.edtTitleNote.setText(oldNote?.title)
             binding.edtNote.setText(oldNote?.description)
@@ -365,6 +397,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
                     setImage(imgDataList)
                 }
             }
+        } else {
+            noteId = Utils.getNoteId()
         }
 
 
@@ -421,31 +455,108 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         if (validateFields()) {
 
-
-            if (editNote == true) {
-                newNote = Note(
-                    title,
-                    note,
-                    type,
-                    timeStamp,
-                    listToString.listToString(imgDataList),
-                    oldNote?.id!!
-                )
-                noteViewModel.updateNote(newNote!!)
-                baseContext.supportFragmentManager.popBackStackImmediate()
-
-            } else {
-                newNote =
-                    Note(title, note, type, timeStamp, listToString.listToString(imgDataList), null)
-                baseContext.supportFragmentManager.popBackStackImmediate()
-                noteViewModel.addNote(newNote!!)
-
+            val xyz = runBlocking {
+                async {
+                    setReminder(title, note)
+                    setNote(title, note, timeStamp, type)
+                }.await()
             }
+
+
         } else {
             Toast.makeText(baseContext, "Cannot store empty note.", Toast.LENGTH_SHORT).show()
             Log.e("Error", "Cannot store empty note.")
         }
 
+    }
+
+    private fun setNote(title: String, note: String, timeStamp: Long, type: String) {
+        if (editNote == true) {
+            newNote = Note(
+                title,
+                note,
+                type,
+                timeStamp,
+                listToString.listToString(imgDataList),
+                noteId,
+                isAlarmSet,
+
+                )
+            noteViewModel.updateNote(newNote!!)
+            baseContext.supportFragmentManager.popBackStackImmediate()
+
+        } else {
+            newNote =
+                Note(
+                    title,
+                    note,
+                    type,
+                    timeStamp,
+                    listToString.listToString(imgDataList),
+                    noteId,
+                    isAlarmSet
+                )
+            baseContext.supportFragmentManager.popBackStackImmediate()
+            noteViewModel.addNote(newNote!!)
+
+        }
+    }
+
+    private fun setReminder(title: String, note: String) {
+        reminderData?.let { reminderData ->
+
+
+            if (isAlarmSet) {
+                reminderData.id = reminderId
+                Log.e("reminderId", reminderData.id.toString())
+                reminderViewModel.updateReminder(reminderData)
+
+            } else {
+                reminderViewModel.insertReminder(reminderData)
+            }
+
+            setReminderAlarm(reminderData, title, note)
+
+        }
+
+    }
+
+
+
+    private fun setReminderAlarm(reminderData: Reminder, title: String, note: String) {
+
+        val alarmItem = AlarmItem(reminderData.reminderTimestamp,title, note,reminderData.reminderRepetition,noteId)
+
+        alarmReminderViewModel.scheduleAlarm(alarmItem)
+
+        Log.e("reminderData", Gson().toJson(reminderData))
+
+//        reminderAlarmManager = baseContext.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+//        alarmPendingIntent = Intent(baseContext, ReminderManager(title, note, noteId)::class.java).let {
+//            PendingIntent.getBroadcast(
+//                baseContext, 1, it,
+//                PendingIntent.FLAG_IMMUTABLE
+//            )
+//        }
+//
+//        reminderAlarmManager?.apply {
+//            if (reminderData.reminderRepetition != 0L) {
+//
+//                setRepeating(
+//                    AlarmManager.RTC_WAKEUP,
+//                    reminderData.reminderTimestamp,
+//                    reminderData.reminderRepetition,
+//                    alarmPendingIntent
+//                )
+//            } else {
+//                set(
+//                    AlarmManager.RTC_WAKEUP,
+//                    reminderData.reminderTimestamp,
+//                    alarmPendingIntent
+//                )
+//            }
+//        }
+        isAlarmSet = true
     }
 
     private fun checkAndRequestPermission() {
@@ -550,8 +661,9 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 //        }
     }
 
-    fun setInstance(editNote: Boolean, note: Note?): Fragment {
-        this.oldNote = note
+    fun setInstance(editNote: Boolean, note: NoteWithReminder?): Fragment {
+        this.oldNote = note?.note
+        this.reminderId = note?.reminder?.id
         this.editNote = editNote
         return this
     }

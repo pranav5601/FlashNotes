@@ -1,6 +1,8 @@
 package com.nav.noteit.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +11,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.nav.noteit.R
+import com.nav.noteit.databaseRelations.NoteWithReminder
 import com.nav.noteit.fragments.FragNotes
 import com.nav.noteit.helper.Constants
 import com.nav.noteit.room_models.Note
@@ -19,8 +23,8 @@ import java.util.*
 class AdapterNotes(private val context: Context,private val clickListener: ClickListeners): RecyclerView.Adapter<AdapterNotes.MyViewHolder>() {
 
 
-    var notesList =  ArrayList<Note>()
-    var fullList = ArrayList<Note>()
+    private var notesList =  ArrayList<NoteWithReminder>()
+    private var fullList = ArrayList<NoteWithReminder>()
 
 
     class MyViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
@@ -32,14 +36,16 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
         private val lytTxtNote = itemView.findViewById<LinearLayout>(R.id.lyt_txtNote)
         private val lytMainNote = itemView.findViewById<CardView>(R.id.lytMainNote)
         private val imgNote = itemView.findViewById<ShapeableImageView>(R.id.imgNote)
+        private val imgNoteReminder = itemView.findViewById<ShapeableImageView>(R.id.imgNoteReminder)
 
 
-        fun binding(note: Note, context: Context, clickListener: ClickListeners) {
+        @SuppressLint("UseCompatLoadingForDrawables")
+        fun binding(note: NoteWithReminder, context: Context, clickListener: ClickListeners) {
 
-            noteTitle.text = note.title
-            noteContent.text = note.description
+            noteTitle.text = note.note.title
+            noteContent.text = note.note.description
             val cal: Calendar = Calendar.getInstance(Locale.ENGLISH)
-            cal.timeInMillis = note.timeStamp
+            cal.timeInMillis = note.note.timeStamp
             noteTime.text = DateFormat.format("dd-MM-yyyy hh:mm:ss",cal).toString()
 
             lytMainNote.setOnClickListener {
@@ -51,7 +57,14 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
                 true
             }
 
-            if(note.type == Constants.noteTypeTxt){
+            if (note.note.isReminderSet){
+                Glide.with(context).load(context.resources.getDrawable(R.drawable.bell, null)).into(imgNoteReminder)
+            }else{
+
+                Glide.with(context).load(context.resources.getDrawable(R.drawable.circular_note_it_logo, null)).into(imgNoteReminder)
+            }
+
+            if(note.note.type == Constants.noteTypeTxt){
                 lytTxtNote.visibility = View.VISIBLE
                 lytImgNote.visibility = View.GONE
             }else{
@@ -65,7 +78,7 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
 
     }
 
-    fun updateList(newList: List<Note>){
+    fun updateList(newList: List<NoteWithReminder>){
 
         fullList.clear()
         fullList.addAll(newList)
@@ -80,7 +93,7 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
         notesList.clear()
         if(search.isNotEmpty()){
             for (item in fullList){
-                if (item.title.lowercase().contains(search.lowercase()) || item.description.lowercase().contains(search.lowercase())){
+                if (item.note.title.lowercase().contains(search.lowercase()) || item.note.description.lowercase().contains(search.lowercase())){
                     notesList.add(item)
                 }
             }
@@ -107,8 +120,8 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
     }
 
     interface ClickListeners {
-        fun onItemClicked(note:Note)
-        fun onLongIteClicked(note:Note, cardView: CardView)
+        fun onItemClicked(note:NoteWithReminder)
+        fun onLongIteClicked(note:NoteWithReminder, cardView: CardView)
     }
 
 

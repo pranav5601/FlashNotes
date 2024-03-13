@@ -12,10 +12,10 @@ import com.nav.noteit.room_models.Note
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * from note_table order by id ASC")
+    @Query("SELECT * from note_table order by noteId ASC")
     fun getAllNotes(): LiveData<List<Note>>
 
-    @Insert
+    @Insert()
     suspend fun insertNote(note: Note)
 
     @Update

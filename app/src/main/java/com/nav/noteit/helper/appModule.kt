@@ -3,9 +3,12 @@ package com.nav.noteit.helper
 import androidx.room.Room
 import com.nav.noteit.adapters.AdapterImageList
 import com.nav.noteit.database.NoteDatabase
+import com.nav.noteit.repositories.AlarmRepoImpl
 import com.nav.noteit.repositories.NoteRepo
+import com.nav.noteit.repositories.ReminderRepo
 import com.nav.noteit.room_models.ListToStringTypeConverter
 import com.nav.noteit.viewmodel.NoteViewModel
+import com.nav.noteit.viewmodel.ReminderAlarmViewModel
 import com.nav.noteit.viewmodel.ReminderViewModel
 import com.nav.noteit.viewmodel.SearchViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -22,7 +25,16 @@ val appModule = module{
 
     single  {
         NoteRepo(get())
+
     }
+    single {
+        AlarmRepoImpl(get())
+    }
+
+    single {
+        ReminderRepo(get())
+    }
+
     viewModel {
         NoteViewModel(get())
     }
@@ -32,7 +44,10 @@ val appModule = module{
     }
 
     viewModel{
-        ReminderViewModel()
+        ReminderViewModel(get())
+    }
+    viewModel {
+        ReminderAlarmViewModel(get())
     }
 
 

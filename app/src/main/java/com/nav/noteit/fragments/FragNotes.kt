@@ -13,13 +13,16 @@ import android.widget.PopupMenu
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.gson.Gson
 import com.nav.noteit.R
 import com.nav.noteit.adapters.AdapterNotes
+import com.nav.noteit.databaseRelations.NoteWithReminder
 import com.nav.noteit.databinding.FragNotesBinding
 import com.nav.noteit.helper.Utils
 import com.nav.noteit.room_models.Note
 
 import com.nav.noteit.viewmodel.NoteViewModel
+import com.nav.noteit.viewmodel.ReminderViewModel
 import com.nav.noteit.viewmodel.SearchViewModel
 import org.koin.android.ext.android.inject
 
@@ -31,9 +34,10 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
     private var clicked = false
     private lateinit var adapterNotes: AdapterNotes
     private var noteList = ArrayList<Note>()
-
+    private val noteWithReminderList: ArrayList<NoteWithReminder> by lazy {  ArrayList() }
     private val noteViewModel: NoteViewModel by inject()
-    private lateinit var selectedNote : Note
+    private val reminderViewModel: ReminderViewModel by inject()
+    private lateinit var selectedNote : NoteWithReminder
     private val searchViewModel :SearchViewModel by activityViewModels()
 
 
@@ -65,7 +69,7 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
             searchViewModel.emptySearch.observe(viewLifecycleOwner) {isEmpty ->
 
                 if (isEmpty) {
-                    adapterNotes.updateList(noteList)
+                    adapterNotes.updateList(noteWithReminderList)
                 } else {
                     adapterNotes.filterList(searchKey)
                 }
@@ -77,24 +81,27 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
     private fun initViewModel() {
 
         noteList.clear()
-            noteViewModel.allNotes.observe(viewLifecycleOwner){
-                it?.let {
-                    if(it.isEmpty()){
-                        binding.notesRcv.visibility = View.GONE
-                        binding.txtNoNoteFound.visibility = View.VISIBLE
-                    }else{
-                        binding.notesRcv.visibility = View.VISIBLE
-                        binding.txtNoNoteFound.visibility = View.GONE
-                    }
-                    noteList.addAll(it)
-                    adapterNotes.updateList(it)
+
+        noteViewModel.allNotesWithReminder?.let {
+
+            it.observe(viewLifecycleOwner){allDataList ->
+                Log.e("all Data",Gson().toJson(allDataList))
+
+                if(allDataList.isEmpty()){
+                    binding.notesRcv.visibility = View.GONE
+                    binding.txtNoNoteFound.visibility = View.VISIBLE
+                }else{
+                    binding.notesRcv.visibility = View.VISIBLE
+                    binding.txtNoNoteFound.visibility = View.GONE
                 }
+
+                noteWithReminderList.addAll(allDataList)
+                adapterNotes.updateList(allDataList)
+
             }
-
-
+        }
 
     }
-
 
 
     private fun initNoteAdapter() {
@@ -169,11 +176,11 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
     override val getBindingLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragNotesBinding
         get() = FragNotesBinding::inflate
 
-    override fun onItemClicked(note: Note) {
+    override fun onItemClicked(note: NoteWithReminder) {
         Utils.addFrag(baseContext.supportFragmentManager,R.id.mainFragContainer,FragEditNote().setInstance(true,note), R.anim.slide_in_top, R.anim.slide_out_top, R.anim.slide_in_bottom, R.anim.slide_out_bottom)
     }
 
-    override fun onLongIteClicked(note: Note, cardView: CardView) {
+    override fun onLongIteClicked(note: NoteWithReminder, cardView: CardView) {
         selectedNote = note
         popOutNote(cardView)
     }
@@ -187,7 +194,10 @@ class FragNotes : FragBase<FragNotesBinding>(), AdapterNotes.ClickListeners,
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.deleteNote){
-            noteViewModel.deleteNote(selectedNote)
+            noteViewModel.deleteNote(selectedNote.note)
+            selectedNote.reminder?.let {
+                reminderViewModel.deleteReminder(selectedNote.reminder)
+            }
             return true
         }
         return false

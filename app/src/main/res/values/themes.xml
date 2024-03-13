@@ -19,6 +19,7 @@
         <item name="statusBarBackground">@color/white</item>
         <item name="android:windowBackground">@color/white</item>
 
+        <item name="materialTimePickerTheme">@style/TimePickerStyle</item>
 
 
         <item name="colorAccent">@color/grey_900</item>
@@ -34,6 +35,10 @@
 
     </style>
 
+
+    <style name="TimePickerStyle" parent="@style/ThemeOverlay.MaterialComponents.TimePicker">
+       <item name="android:background">@drawable/reminder_box_shape</item>
+    </style>
 
     <style name="divider">
         <item name="android:layout_height">1dp</item>

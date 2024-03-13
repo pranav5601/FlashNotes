@@ -3,7 +3,6 @@ package com.nav.noteit.activities
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
-import com.nav.noteit.helper.listenSearchText
 
 abstract class ActBase : AppCompatActivity() {
 

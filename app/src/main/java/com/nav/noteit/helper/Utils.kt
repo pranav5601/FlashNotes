@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import java.io.FileNotFoundException
+import java.util.UUID
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -18,6 +19,11 @@ import java.util.regex.Pattern
 object Utils {
 
 
+    @Synchronized
+    fun getNoteId(): Int {
+
+        return UUID.randomUUID().hashCode()
+    }
     fun addFrag(fragmentManager: FragmentManager, containerId:Int=0, fragment: Fragment, anim_enter: Int, anim_exit: Int,  pop_enter: Int, pop_exit: Int){
         val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragTransaction.replace(containerId,fragment)

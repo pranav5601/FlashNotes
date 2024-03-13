@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nav.noteit.dao.NoteDao
+import com.nav.noteit.databaseRelations.NoteWithReminder
 import com.nav.noteit.repositories.NoteRepo
 import com.nav.noteit.room_models.Note
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,8 @@ class NoteViewModel(private val noteRepo: NoteRepo): ViewModel() {
 
     val allNotes: LiveData<List<Note>> = noteRepo.allNotes
 
+
+    val allNotesWithReminder: LiveData<List<NoteWithReminder>>? = noteRepo.allNotesWithReminder
 
 
     fun deleteNote(note:Note) = viewModelScope.launch(Dispatchers.IO) {
