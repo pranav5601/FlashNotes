@@ -119,25 +119,6 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
 
         }
 
-
-//        filter = IntentFilter().apply { addAction("click") }
-//
-//        reminderBroadcastReceiver = object : BroadcastReceiver() {
-//            override fun onReceive(context: Context, intent: Intent) {
-//                noteId = intent.getIntExtra("clicked", 0)
-//                reminderId = intent.getIntExtra("reminder_id", 0)
-//                Log.e("note id", noteId.toString())
-//
-////                Toast.makeText(baseContext, onSaveClickListener().toString(), Toast.LENGTH_SHORT)
-////                    .show()
-//
-//                LocalBroadcastManager.getInstance(baseContext)
-//                    .unregisterReceiver(reminderBroadcastReceiver)
-//
-//            }
-//        }
-//        LocalBroadcastManager.getInstance(baseContext)
-//            .registerReceiver(reminderBroadcastReceiver, filter)
     }
 
 
@@ -178,10 +159,8 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
 
 
         if (reminderData != null) {
-            Toast.makeText(baseContext, reminderData.reminderDate, Toast.LENGTH_SHORT).show()
             dateList.add(reminderData.reminderDate)
             binding.spnDate.setSelection(dateList.size - 1)
-            Log.e("dateList",dateList.toString())
         } else {
             if (reminderHour in 21..24) {
                 binding.spnDate.setSelection(1)
@@ -368,8 +347,8 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
                     (4) -> {
                         val picker = MaterialTimePicker.Builder()
                             .setTimeFormat(TimeFormat.CLOCK_12H)
-                            .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
-                            .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
+                            .setHour(reminderCalender.get(Calendar.HOUR_OF_DAY))
+                            .setMinute(reminderCalender.get(Calendar.MINUTE))
                             .setTitleText("Pick a time...")
                             .build()
 
@@ -534,12 +513,8 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
             Toast.makeText(baseContext, formattedDate, Toast.LENGTH_SHORT).show()
         }
         reminderDatePicker.addOnNegativeButtonClickListener {
-            reminderDatePicker.addOnNegativeButtonClickListener {
-                parent?.setSelection(0)
-            }
-            reminderDatePicker.addOnDismissListener {
-                parent?.setSelection(0)
-            }
+            dateList.add(reminder?.reminderDate!!)
+            binding.spnDate.setSelection(dateList.size - 1)
         }
 
         reminderDatePicker.show(baseContext.supportFragmentManager, "Reminder DatePicker")
@@ -609,7 +584,9 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
         }
 
         picker.addOnNegativeButtonClickListener {
-            parent?.setSelection(startPoint)
+            itemList.add(TimeItem(selectedTime, "", true))
+            binding.spnTime.setSelection(itemList.size - 1)
+//            parent?.setSelection(startPoint)
         }
 //        picker.addOnDismissListener {
 //            parent?.setSelection(0)

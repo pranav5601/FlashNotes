@@ -2,6 +2,7 @@ package com.nav.noteit.adapters
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.nav.noteit.R
+import com.nav.noteit.room_models.ListToStringTypeConverter
 
 class AdapterImageList(private val context: Context,private val imageClickListener: ImageClickListener) : RecyclerView.Adapter<AdapterImageList.ImageViewHolder>() {
 
@@ -58,6 +60,7 @@ class AdapterImageList(private val context: Context,private val imageClickListen
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
 
         imageList.let {
+            Log.e("imageList", imageList.toString())
             holder.bindings(it[position], position,context,imageClickListener)
         }
 

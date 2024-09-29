@@ -17,6 +17,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.nav.noteit.R
 import com.nav.noteit.databaseRelations.NoteWithReminder
 import com.nav.noteit.helper.Constants
+import com.nav.noteit.room_models.ListToStringTypeConverter
 import java.util.*
 
 class AdapterNotes(private val context: Context,private val clickListener: ClickListeners, private val userId: String): RecyclerView.Adapter<AdapterNotes.MyViewHolder>() {
@@ -24,6 +25,7 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
 
     private var notesList =  ArrayList<NoteWithReminder>()
     private var fullList = ArrayList<NoteWithReminder>()
+
 
 
     class MyViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
@@ -36,6 +38,8 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
         private val lytMainNote = itemView.findViewById<CardView>(R.id.lytMainNote)
         private val imgNote = itemView.findViewById<ShapeableImageView>(R.id.imgNote)
         private val imgNoteReminder = itemView.findViewById<ShapeableImageView>(R.id.imgNoteReminder)
+        var listToStringTypeConverter = ListToStringTypeConverter()
+
 
 
         @SuppressLint("UseCompatLoadingForDrawables")
@@ -52,10 +56,10 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
             }
 
             if (note.note.imageList.length > 2){
-                val pattern = Regex("""content://media/picker/0/com\.android\.providers\.media\.photopicker/media/\d+""")
 
 
-                val imgList = pattern.findAll(note.note.imageList).map { it.value }.toList()
+                val imgList = listToStringTypeConverter.stringToList(note.note.imageList)
+
 
                 val imgUri = Uri.parse(imgList[0])
 
