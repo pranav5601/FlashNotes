@@ -3,8 +3,10 @@ package com.nav.noteit.repositories
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.core.view.ContentInfoCompat.Flags
@@ -23,6 +25,9 @@ class AlarmRepoImpl(val context: Context) : AlarmRepo {
             putExtra("reminder_title", alarmItem.title)
             putExtra("reminder_desc", alarmItem.description)
             putExtra("note_id", alarmItem.noteId)
+            putExtra("reminder_id", alarmItem.reminderId)
+            putExtra("reminder_repetition", alarmItem.alarmRepetition)
+
             flags = Intent.FLAG_RECEIVER_FOREGROUND
         }
 
@@ -45,9 +50,20 @@ class AlarmRepoImpl(val context: Context) : AlarmRepo {
             )
         }
 
+        val receiver = ComponentName(context, ReminderManager::class.java)
+
+        context.packageManager?.setComponentEnabledSetting(
+            receiver,
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+            PackageManager.DONT_KILL_APP
+        )
+
         val date = Calendar.getInstance()
         date.timeInMillis = alarmItem.alarmTime
 
+
+
+        Log.e("repetition duration", alarmItem.alarmRepetition.toString())
         Log.e(
             "Alarm",
             "Alarm set at ${date.get(Calendar.HOUR_OF_DAY)} : ${date.get(Calendar.MINUTE)}"

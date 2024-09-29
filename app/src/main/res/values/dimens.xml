@@ -3,4 +3,5 @@
     <dimen name="note_title">25sp</dimen>
     <dimen name="note_desc">13sp</dimen>
     <dimen name="note_content">16sp</dimen>
+    <dimen name="edt_space_between">30dp</dimen>
 </resources>

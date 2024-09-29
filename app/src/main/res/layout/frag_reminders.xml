@@ -3,114 +3,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:focusable="true"
     android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".fragments.FragReminders">
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvEmptyReminders"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="You do not have any reminders yet."
+            android:textAlignment="center"
+            android:textColor="@color/txt_color"
+            android:textSize="22sp"
+             />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="1">
-
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:layout_weight="0.27"
-                    android:text="@string/set_reminder"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/very_very_big_text" />
-
-
-                <ImageView
-
-                    android:id="@+id/switch_reminder"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="end"
-                    android:layout_weight="0.7"
-                    android:padding="10dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/reminder_switch" />
-
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/lyt_reminder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-
-                <LinearLayout
-                    android:id="@+id/lyt_select_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/btn_ripple"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="15dp">
-
-                    <ImageView
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_timer" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:text="@string/time"
-                        android:textSize="20sp" />
-
-                </LinearLayout>
-
-
-                <TextView
-                    android:id="@+id/txt_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:text="08:00 PM"
-                    android:textSize="20sp" />
-
-
-                <Button
-                    android:id="@+id/btnSave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginBottom="15dp"
-                    android:background="@color/yellow_400"
-                    android:text="@string/save"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white" />
-
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-
-    </ScrollView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvRemindersList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
 
 </LinearLayout>

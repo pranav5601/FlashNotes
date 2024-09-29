@@ -12,7 +12,7 @@ class CustomDateMenuAdapter(private val context: Context, private val dateList: 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getCount(): Int {
-        return dateList.size
+        return 4
     }
 
     override fun getItem(position: Int): String {

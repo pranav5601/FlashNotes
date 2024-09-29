@@ -1,18 +1,19 @@
 package com.nav.noteit.activities
 
-import android.graphics.Color
-import android.graphics.Rect
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.nav.noteit.R
 import com.nav.noteit.databinding.ActMainBinding
@@ -20,15 +21,20 @@ import com.nav.noteit.fragments.FragNotes
 import com.nav.noteit.fragments.FragReminders
 import com.nav.noteit.helper.Utils
 import com.nav.noteit.viewmodel.SearchViewModel
+import com.nav.noteit.viewmodel.UserViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 
 class ActMain : ActBase() {
 
 
     private lateinit var binding: ActMainBinding
-    lateinit var menu: Menu
+    private lateinit var menu: Menu
     private val searchViewModel: SearchViewModel by viewModels()
     lateinit var snackBarReminder: Snackbar
+    private val userViewModel by inject<UserViewModel>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,10 +46,33 @@ class ActMain : ActBase() {
         initVariables()
         initClick()
         initFragment()
-        setNavigationDrawer()
-        searchNote()
-//        selectMenuDrawer()
+        lifecycleScope.launch {
+            async {
+                getUserData()
 
+            }.await()
+
+            setNavigationDrawer()
+        }
+        searchNote()
+        callWorkRequest()
+
+
+//        selectMenuDrawer()
+        if (Utils.isInternetConnectedCheck(this@ActMain)) {
+            Toast.makeText(this@ActMain, "Internet is active", Toast.LENGTH_SHORT).show()
+        } else {
+
+            Toast.makeText(this@ActMain, "Internet is inactive", Toast.LENGTH_SHORT).show()
+        }
+
+
+    }
+
+    private fun getUserData() {
+
+        userViewModel.getUserDataFromPrefs()
+        getTextViewFromDrawer()
 
     }
 
@@ -65,7 +94,6 @@ class ActMain : ActBase() {
             }
         }
     }
-
 
 
     fun changeToSaveIcon(isShow: Boolean, clickListeners: ClickListeners?) {
@@ -136,14 +164,19 @@ class ActMain : ActBase() {
     }
 
     private fun initVariables() {
+
+        userViewModel.isRememberMeSet()
         menu = binding.mainNavView.menu
     }
 
 
     private fun setNavigationDrawer() {
+
+
         binding.mainNavView.setNavigationItemSelectedListener {
 
             binding.mainDrawerLyt.closeDrawer(GravityCompat.START)
+
 
             binding.mainNavView.setCheckedItem(it.itemId)
 
@@ -193,6 +226,16 @@ class ActMain : ActBase() {
                 }
 
                 R.id.actionLogout -> {
+
+
+                    showLoader()
+
+                    userViewModel.clearData()
+
+                    startActivity(Intent(this@ActMain, ActLogin::class.java))
+                    closeLoader()
+                    finish()
+
                     true
                 }
 
@@ -200,7 +243,21 @@ class ActMain : ActBase() {
                     false
                 }
             }
+        }
+    }
 
+    private fun getTextViewFromDrawer() {
+        val headerView = binding.mainNavView.getHeaderView(0)
+
+        val tv = headerView.findViewById<TextView>(R.id.txtNavUserName)
+
+        tv?.let {
+
+            userViewModel.userData.observe(this@ActMain) { userData ->
+
+                tv.text = userData.fullName
+
+            }
         }
 
 
@@ -208,12 +265,12 @@ class ActMain : ActBase() {
 
     override fun onRestart() {
         super.onRestart()
-        Log.e("ActMain","onRestart")
+        Log.e("ActMain", "onRestart")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.e("ActMain","onResume")
+        Log.e("ActMain", "onResume")
 
     }
 
@@ -221,6 +278,7 @@ class ActMain : ActBase() {
         binding = ActMainBinding.inflate(layoutInflater)
 
         return binding.root
+
     }
 
     private fun initClick() {

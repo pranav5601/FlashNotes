@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:animateLayoutChanges="true"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".fragments.FragEditNote">
@@ -98,20 +99,28 @@
 
 
                         <LinearLayout
+
                             android:id="@+id/lytFinalReminderTime"
                             android:visibility="gone"
                             android:layout_marginStart="15dp"
                             android:orientation="horizontal"
                             android:layout_width="wrap_content"
+                            tools:visibility="visible"
+                            android:clickable="true"
+                            android:elevation="5dp"
                             android:layout_height="wrap_content">
 
                             <androidx.cardview.widget.CardView
-                                android:padding="4dp"
+                                app:cardCornerRadius="10dp"
                                 android:elevation="2dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content">
 
                                 <LinearLayout
+                                    android:id="@+id/btnOpenReminder"
+                                    android:padding="6dp"
+                                    android:background="@drawable/btn_ripple"
+
                                     android:orientation="horizontal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content">
@@ -119,7 +128,7 @@
 
 
                                 <ImageView
-                                    android:id="@+id/alarmIcon3"
+                                    android:id="@+id/reminderIcon"
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
                                     android:layout_weight="0"

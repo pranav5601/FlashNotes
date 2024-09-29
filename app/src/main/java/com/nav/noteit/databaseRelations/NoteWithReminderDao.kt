@@ -9,9 +9,12 @@ import androidx.room.Transaction
 interface NoteWithReminderDao {
 
     @Transaction
-    @Query("SELECT * FROM note_table")
-    fun getNoteWithReminder(): LiveData<List<NoteWithReminder>>?
+    @Query("SELECT * FROM note_table WHERE user_id = :userId order by timeStamp DESC")
+    fun getNoteWithReminder(userId: String): LiveData<List<NoteWithReminder>>
 
+    @Transaction
+    @Query("SELECT * FROM note_table WHERE noteId = :noteId")
+    fun getNoteWithReminderByNoteId(noteId: Int): LiveData<NoteWithReminder>
 
 
 }

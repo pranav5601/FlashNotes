@@ -3,8 +3,6 @@ package com.nav.noteit.fragments
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +11,10 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.setFragmentResultListener
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.DateValidatorPointForward
@@ -29,8 +30,6 @@ import com.nav.noteit.databinding.FragDateTimePickerBinding
 import com.nav.noteit.helper.Constants
 import com.nav.noteit.models.TimeItem
 import com.nav.noteit.room_models.Reminder
-import com.nav.noteit.viewmodel.ReminderViewModel
-import org.koin.android.ext.android.inject
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -59,33 +58,50 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
     private var reminderAlarmManager: AlarmManager? = null
     private lateinit var alarmPendingIntent: PendingIntent
     private var reminderId: Int? = null
-    private lateinit var reminder: Reminder
+    private var reminder: Reminder? = null
     private var startPoint = 0
+    private var itemList: MutableList<TimeItem> = ArrayList()
 
     private var reminderRepetition: Long = 0
 
     override fun setUpFrag() {
 
+
         setCurrentTimeAndDate()
-        setUpTimeSpinner()
-        setDateSpinner()
+        setUpTimeSpinner(null)
+        setDateSpinner(null)
         setUpRepetition()
         initClick()
         whenReceivedBroadcast()
+        setSavedData()
 
 
     }
 
+    fun setInstance(reminderData: Reminder?): Fragment {
+        this.reminder = reminderData
+        return this
+    }
+
+    private fun setSavedData() {
+
+        reminder?.let { data ->
+
+            setUpTimeSpinner(data)
+            setDateSpinner(data)
+
+        }
+
+    }
 
 
     private fun setCurrentTimeAndDate() {
 
         reminderCalender = Calendar.getInstance()
         val time = Calendar.getInstance().time
-        val currentTimeFormat = SimpleDateFormat("KK:mm aaa", Locale.getDefault())
+        val currentTimeFormat = SimpleDateFormat("hh:mm aaa", Locale.getDefault())
         currentTime = currentTimeFormat.format(time)
         reminderHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
         val currentDateFormat = SimpleDateFormat("LLLL dd", Locale.getDefault())
         currentDate = currentDateFormat.format(time)
 
@@ -93,23 +109,35 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
     }
 
     private fun whenReceivedBroadcast() {
-        filter = IntentFilter().apply { addAction("click") }
 
-        reminderBroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                noteId = intent.getIntExtra("clicked",0)
-                reminderId = intent.getIntExtra("reminder_id", 0)
-                Log.e("Save", onSaveClickListener().toString())
-                Log.e("note id", noteId.toString())
-                Toast.makeText(baseContext, onSaveClickListener().toString(), Toast.LENGTH_SHORT)
-                    .show()
-                LocalBroadcastManager.getInstance(baseContext)
-                    .unregisterReceiver(reminderBroadcastReceiver)
+        setFragmentResultListener("requestClick") { requestKey, bundle ->
+            // We use a String here, but any type that can be put in a Bundle is supported.
+            noteId = bundle.getInt("note_id")
 
-            }
+            Toast.makeText(baseContext, onSaveClickListener().toString(), Toast.LENGTH_SHORT)
+                .show()
+
         }
-        LocalBroadcastManager.getInstance(baseContext)
-            .registerReceiver(reminderBroadcastReceiver, filter)
+
+
+//        filter = IntentFilter().apply { addAction("click") }
+//
+//        reminderBroadcastReceiver = object : BroadcastReceiver() {
+//            override fun onReceive(context: Context, intent: Intent) {
+//                noteId = intent.getIntExtra("clicked", 0)
+//                reminderId = intent.getIntExtra("reminder_id", 0)
+//                Log.e("note id", noteId.toString())
+//
+////                Toast.makeText(baseContext, onSaveClickListener().toString(), Toast.LENGTH_SHORT)
+////                    .show()
+//
+//                LocalBroadcastManager.getInstance(baseContext)
+//                    .unregisterReceiver(reminderBroadcastReceiver)
+//
+//            }
+//        }
+//        LocalBroadcastManager.getInstance(baseContext)
+//            .registerReceiver(reminderBroadcastReceiver, filter)
     }
 
 
@@ -135,9 +163,10 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
         binding.spnRepetition.adapter = repeatAdapter
     }
 
-    private fun setDateSpinner() {
+    private fun setDateSpinner(reminderData: Reminder?) {
 
 //        val dateList: ArrayList<String> = ArrayList<String>()
+        dateList.clear()
         dateList.add("Today")
         dateList.add("Tomorrow")
         dateList.add("Next Week")
@@ -146,20 +175,32 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
         val customDateMenuAdapter = CustomDateMenuAdapter(baseContext, dateList)
         binding.spnDate.adapter = customDateMenuAdapter
 
-        if (reminderHour in 21 .. 24){
-            binding.spnDate.setSelection(1)
-        }else{
-            binding.spnDate.setSelection(0)
+
+
+        if (reminderData != null) {
+            Toast.makeText(baseContext, reminderData.reminderDate, Toast.LENGTH_SHORT).show()
+            dateList.add(reminderData.reminderDate)
+            binding.spnDate.setSelection(dateList.size - 1)
+            Log.e("dateList",dateList.toString())
+        } else {
+            if (reminderHour in 21..24) {
+                binding.spnDate.setSelection(1)
+            } else {
+                binding.spnDate.setSelection(0)
+            }
         }
+
+
 
         binding.spnDate.onItemSelectedListener = this
 
-//        selectedDate = binding.spnDate.selectedItem.toString()
+        selectedDate = binding.spnDate.selectedItem.toString()
     }
 
 
-    private fun setUpTimeSpinner() {
-        val itemList: MutableList<TimeItem> = ArrayList()
+    private fun setUpTimeSpinner(reminderData: Reminder?) {
+
+        itemList.clear()
         itemList.add(TimeItem("Morning", "8:00 AM", setActiveTime()[0]!!))
         itemList.add(TimeItem("Afternoon", "1:00 PM", setActiveTime()[1]!!))
         itemList.add(TimeItem("Evening", "6:00 PM", setActiveTime()[2]!!))
@@ -178,7 +219,18 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
             }
         }
 
-        binding.spnTime.setSelection(startPoint)
+
+        if (reminderData != null) {
+            selectedTime = reminderData.reminderTime
+            reminderCalender.timeInMillis = reminderData.reminderTimestamp
+            itemList.add(TimeItem(selectedTime, "", true))
+            binding.spnTime.setSelection(itemList.size - 1)
+        } else {
+
+            binding.spnTime.setSelection(startPoint)
+        }
+
+
 
 
         binding.spnTime.onItemSelectedListener = this
@@ -200,14 +252,14 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
                 timeMap[3] = true
             }
 
-            in 9 .. 13 -> {
+            in 9..12 -> {
                 timeMap[0] = false
                 timeMap[1] = true
                 timeMap[2] = true
                 timeMap[3] = true
             }
 
-            in 14 .. 17 -> {
+            in 13..17 -> {
                 timeMap[0] = false
                 timeMap[1] = false
                 timeMap[2] = true
@@ -228,7 +280,7 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
     override val getBindingLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragDateTimePickerBinding
         get() = FragDateTimePickerBinding::inflate
 
-    fun onSaveClickListener(): List<String> {
+    private fun onSaveClickListener(): List<String> {
         val time: TimeItem? = binding.spnTime.selectedItem as? TimeItem
 
         if (time?.timeTitle?.isEmpty()!!) {
@@ -237,11 +289,14 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
 
         val date = binding.spnDate.selectedItem.toString()
         val repetition = binding.spnRepetition.selectedItem.toString()
+        val reminderTimestamp = reminderCalender.timeInMillis
         Log.e("reminderCalender", reminderCalender.timeInMillis.toString() + repetition)
 
-        val reminderDate = Reminder(
+        val reminderData = Reminder(
             null,
             noteId,
+            null,
+            getUserIdFromPrefs()!!,
             time.timeTitle,
             selectedDate,
             reminderRepetition,
@@ -249,15 +304,14 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
             0,
             0
         )
-        val sendData = Intent("send_data").apply {
-            putExtra("reminder_data", Gson().toJson(reminderDate))
-        }
-        LocalBroadcastManager.getInstance(baseContext).sendBroadcast(sendData)
+
+        setFragmentResult(
+            Constants.REQUEST_REMINDER_KEY,
+            bundleOf(Constants.REMINDER_DATA_KEY to Gson().toJson(reminderData))
+        )
 
         return listOf(time.timeTitle, date, repetition)
     }
-
-
 
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, p3: Long) {
@@ -277,7 +331,6 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
                         reminderCalender.set(Calendar.SECOND, 0)
                         mainTitle?.text = getString(R.string._08_00_am)
                         subTitle?.visibility = View.GONE
-
 
                     }
 
@@ -323,7 +376,6 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
                         openClock(picker, mainTitle, subTitle, parent)
 
                     }
-
 
                 }
             }
@@ -399,8 +451,6 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
                         openCalender(reminderDatePicker, mainDateTitle, parent)
                     }
                 }
-
-
             }
 
             (binding.spnRepetition.adapter) -> {
@@ -442,14 +492,9 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
                         mainRepetitionTitle?.text = getString(R.string.repeats_yearly)
 
                     }
-
                 }
-
-
             }
         }
-
-
     }
 
     private fun openCalender(
@@ -531,47 +576,36 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
 
         picker.addOnPositiveButtonClickListener {
 
-            var hour = ""
-            var amPm = ""
 
-            when (picker.hour) {
-                in 13..21 -> {
+            val amPm = if (picker.hour < 12) "AM" else "PM"
+            val hour24 = picker.hour
+            require(hour24 in 0..23) { "Hour must be between 0 and 23" }
 
-                    hour = "0" + (picker.hour - 12).toString()
-                    amPm = "PM"
-                }
-
-                in 22..24 -> {
-                    hour = (picker.hour - 12).toString()
-                    amPm = "PM"
-                }
-
-                in 1..9 -> {
-                    hour = "0" + (picker.hour).toString()
-                    amPm = "AM"
-                }
-
-                in 10..12 -> {
-                    hour = (picker.hour).toString()
-                    amPm = "AM"
-                }
+            val hour = when {
+                hour24 == 0 -> 12 // Midnight
+                hour24 > 12 -> hour24 - 12 // PM hours
+                else -> hour24 // AM hours
             }
 
-            val minute = if (picker.minute.toString().length < 2) {
+            val hourString = if (hour < 10) "0$hour" else hour.toString()
+            val minute = if (picker.minute < 10)
                 "0${picker.minute}"
-            } else {
+            else
                 picker.minute.toString()
-            }
 
 
+            selectedTime = getString(R.string.formatted_time, hourString, minute, amPm)
+
+
+            itemList.add(TimeItem(selectedTime, "", true))
 
             reminderCalender.set(Calendar.HOUR_OF_DAY, picker.hour)
             reminderCalender.set(Calendar.MINUTE, picker.minute)
             reminderCalender.set(Calendar.SECOND, 0)
 
-            selectedTime = getString(R.string.formatted_time, hour, minute, amPm)
-            mainTitle?.text = selectedTime
-            subTitle?.visibility = View.GONE
+            setTimerFromClock(mainTitle, subTitle)
+
+
         }
 
         picker.addOnNegativeButtonClickListener {
@@ -579,9 +613,20 @@ class FragDateTimePicker : FragBase<FragDateTimePickerBinding>(),
         }
 //        picker.addOnDismissListener {
 //            parent?.setSelection(0)
-//        }
+//        }`
 
 
+    }
+
+    private fun setTimerFromClock(
+
+        mainTitle: TextView?,
+        subTitle: TextView?
+    ) {
+
+        mainTitle?.text = selectedTime
+        subTitle?.visibility = View.GONE
+        binding.spnTime.setSelection(itemList.size - 1)
     }
 
     /*private fun showListPopupWindow(anchor: View) {

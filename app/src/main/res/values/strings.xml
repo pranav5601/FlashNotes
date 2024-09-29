@@ -48,6 +48,22 @@
     <string name="repeats_weekly">Repeats Weekly</string>
     <string name="repeats_monthly">Repeats Monthly</string>
     <string name="repeats_yearly">Repeats Yearly</string>
+    <string name="sign_up_here">Sign Up Here.</string>
+    <string name="email">Email</string>
+    <string name="full_name">Full Name</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="country">Country</string>
+    <string name="forget_password">Forget Password?</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="register_with">Register with...</string>
+    <string name="already_have_an_account_login_here">Already have an account? Login here.</string>
+    <string name="login">Login</string>
+    <string name="don_t_have_an_account_sign_up_here">Don\'t have an account? Sign up here.</string>
+    <string name="please_click_the_plus_button_to_create_your_first_note">Please click the plus button to create your first note.</string>
+    <string name="location">Location</string>
+    <string name="date_time">Date/Time</string>
 
     <dimen name="very_very_small_text">9sp</dimen>
     <dimen name="very_very_big_text">25sp</dimen>

@@ -14,14 +14,14 @@ class ReminderViewPagerAdapter(fa: FragmentActivity, behaviour: Int,val reminder
     override fun createFragment(position: Int): Fragment {
         return when(position){
             (0)->{
-                FragDateTimePicker()
+                FragDateTimePicker().setInstance(reminderData)
             }
             (1)->{
                 FragPlacePicker()
             }
 
             else -> {
-                FragDateTimePicker()
+                FragDateTimePicker().setInstance(reminderData)
             }
         }
     }

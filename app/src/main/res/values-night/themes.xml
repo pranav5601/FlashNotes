@@ -3,7 +3,7 @@
     <style name="Theme.NoteIt" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimaryVariant">@color/purple_500</item>
         <item name="colorOnPrimary">@color/grey_900</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/grey_700</item>
@@ -49,5 +49,10 @@
         <item name="android:background">@color/grey_200</item>
         <item name="android:layout_marginStart">15dp</item>
         <item name="android:layout_marginEnd">15dp</item>
+    </style>
+
+    <style name="Loader.Theme" parent="Theme.NoteIt">
+        <item name="android:colorAccent">@color/purple_200</item>
+        <item name="colorAccent">@color/purple_200</item>
     </style>
 </resources>

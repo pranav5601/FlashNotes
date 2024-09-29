@@ -9,13 +9,14 @@
         android:id="@+id/txtNavUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_gravity="start"
+        android:layout_marginStart="@dimen/edt_space_between"
         android:layout_marginTop="35dp"
         android:text="@string/user_name"
         android:textSize="40sp" />
 
     <View
         style="@style/divider"
-        android:layout_marginTop="15dp" />
+        android:layout_marginTop="25dp" />
 
 </LinearLayout>

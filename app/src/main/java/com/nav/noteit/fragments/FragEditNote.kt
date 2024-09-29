@@ -4,13 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.Dialog
-import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -30,12 +26,17 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.google.android.material.tabs.TabLayout
@@ -48,7 +49,6 @@ import com.nav.noteit.adapters.ReminderViewPagerAdapter
 import com.nav.noteit.databaseRelations.NoteWithReminder
 import com.nav.noteit.databinding.FragEditNoteBinding
 import com.nav.noteit.helper.Constants
-import com.nav.noteit.helper.ReminderManager
 import com.nav.noteit.helper.Utils
 import com.nav.noteit.models.AlarmItem
 import com.nav.noteit.room_models.ListToStringTypeConverter
@@ -57,9 +57,11 @@ import com.nav.noteit.room_models.Reminder
 import com.nav.noteit.viewmodel.NoteViewModel
 import com.nav.noteit.viewmodel.ReminderAlarmViewModel
 import com.nav.noteit.viewmodel.ReminderViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 
 class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
@@ -87,12 +89,12 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private lateinit var reminderDialog: Dialog
     private var noteId: Int = 0
     private var reminderData: Reminder? = null
-    private lateinit var reminderBroadcastReceiver: BroadcastReceiver
-    private lateinit var intentFilter: IntentFilter
     private var reminderAlarmManager: AlarmManager? = null
-    private lateinit var alarmPendingIntent: PendingIntent
     private var isAlarmSet: Boolean = false
-    private val alarmReminderViewModel by inject<ReminderAlarmViewModel> ()
+    private var type: String = Constants.noteTypeTxt
+    private val alarmReminderViewModel by inject<ReminderAlarmViewModel>()
+    private var time = 0L
+    private lateinit var reminderCalendar: Calendar
 
 
     //animation
@@ -121,28 +123,102 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         initView()
         initClick()
         setData()
-        receiveBroadcast()
+        receiveReminderDataFromPicker()
 
     }
 
-    private fun receiveBroadcast() {
-        intentFilter = IntentFilter().apply {
-            addAction("send_data")
+    private fun setReminderData(hour: Int) {
+        reminderCalendar = Calendar.getInstance()
+        val currentDate = reminderCalendar.get(Calendar.DATE)
+        reminderCalendar.add(Calendar.DAY_OF_MONTH, 1)
+        reminderCalendar.set(
+            reminderCalendar.get(Calendar.YEAR),
+            reminderCalendar.get(Calendar.MONTH),
+            reminderCalendar.get(Calendar.DAY_OF_MONTH),
+            hour,
+            0,
+            0
+        )
+        time = reminderCalendar.timeInMillis
+
+        val currentTimeFormatForDate =
+            SimpleDateFormat("LLLL dd", Locale.getDefault())
+
+        val currentTimeFormatForTime =
+            SimpleDateFormat("KK:mm aaa", Locale.getDefault())
+
+
+        val txtDate = currentTimeFormatForDate.format(time)
+        val txtTime = currentTimeFormatForTime.format(time)
+        Toast.makeText(baseContext, txtTime, Toast.LENGTH_SHORT).show()
+
+
+        isAlarmSet = true
+
+        reminderData = Reminder(
+            null,
+            noteId,
+            binding.edtTitleNote.text.toString(),
+            getUserIdFromPrefs()!!,
+            txtTime,
+            txtDate,
+            0L,
+            reminderCalendar.timeInMillis,
+            0L,
+            0L
+        )
+        setReminderTile(time, 0L)
+        snackBarReminder.dismiss()
+        showBlurBg(false)
+
+
+    }
+
+
+    private fun setReminderTile(reminderTimestamp: Long?, reminderRepetition: Long?) {
+
+        binding.lytFinalReminderTime.visibility = View.VISIBLE
+
+
+        if (reminderRepetition != 0L) {
+            binding.reminderIcon.setPadding(8)
+            Glide.with(baseContext)
+                .load(AppCompatResources.getDrawable(baseContext, R.drawable.repeat))
+                .into(binding.reminderIcon)
+        } else {
+
+            Glide.with(baseContext)
+                .load(AppCompatResources.getDrawable(baseContext, R.drawable.reminder_asset))
+                .into(binding.reminderIcon)
         }
 
-        reminderBroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                reminderData =
-                    Gson().fromJson(intent?.getStringExtra("reminder_data"), Reminder::class.java)
-//                Log.e("reminderData", reminderData.toString())
-                LocalBroadcastManager.getInstance(baseContext)
-                    .unregisterReceiver(reminderBroadcastReceiver)
+        val currentTimeFormat =
+            SimpleDateFormat("LLLL dd, hh:mm aaa", Locale.getDefault())
+
+        val txtTime = currentTimeFormat.format(reminderTimestamp)
+        Log.e("txtTime", txtTime)
+
+        binding.txtSelectedTime.text = txtTime
+
+    }
+
+
+    private fun receiveReminderDataFromPicker() {
+
+
+        setFragmentResultListener(Constants.REQUEST_REMINDER_KEY) { requestKey, bundle ->
+
+            bundle.getString(Constants.REMINDER_DATA_KEY)?.let { data ->
+
+                reminderData = Gson().fromJson(data, Reminder::class.java)
+                isAlarmSet = true
+
+                Log.e("reminderData", data)
+                setReminderTile(reminderData?.reminderTimestamp, reminderData?.reminderRepetition)
             }
 
         }
 
-        LocalBroadcastManager.getInstance(baseContext)
-            .registerReceiver(reminderBroadcastReceiver, intentFilter)
     }
 
 
@@ -156,11 +232,17 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         binding.btnAddItems.setOnClickListener {
             openSubFab()
+            Utils.hideSoftKeyboard(baseContext)
 
         }
 
         binding.btnCreateReminder.setOnClickListener {
             openSnackBarForReminder(it)
+        }
+
+        binding.btnOpenReminder.setOnClickListener {
+
+            setDialogBox()
         }
 
         binding.btnAddImages.setOnClickListener {
@@ -192,7 +274,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         snackBarReminder = Snackbar.make(view, "", Snackbar.LENGTH_INDEFINITE)
         openSubFab()
-        val customView = layoutInflater.inflate(R.layout.cell_reminder_snackbar, null) as ViewGroup
+        val customView =
+            layoutInflater.inflate(R.layout.cell_reminder_snackbar, null) as ViewGroup
         snackBarReminder.view.setBackgroundColor(Color.TRANSPARENT)
         val snackbarLayout: SnackbarLayout = snackBarReminder.view as SnackbarLayout
         snackbarInternalClick(customView)
@@ -213,34 +296,30 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     private fun snackbarInternalClick(customView: ViewGroup) {
         val txtTomorrowReminder: ConstraintLayout =
             customView.findViewById(R.id.lytTomorrowMorningReminder)
-        val btnCustomReminder: ConstraintLayout = customView.findViewById(R.id.lytAddCustomReminder)
+
+        val txtTomorrowEveReminder: ConstraintLayout =
+            customView.findViewById(R.id.lytTomorrowEveningReminder)
+        val btnCustomReminder: ConstraintLayout =
+            customView.findViewById(R.id.lytAddCustomReminder)
         val txtCustomReminder: TextView = customView.findViewById(R.id.txtReminder)
         txtTomorrowReminder.setOnClickListener {
-            Toast.makeText(baseContext, "Clicked", Toast.LENGTH_SHORT).show()
+            setReminderData(8)
+//            reminderData = Reminder(null, noteId, binding.edtTitleNote.text.toString(), getUserIdFromPrefs()!!, reminderCalendar.timeInMillis)
+        }
 
+        txtTomorrowEveReminder.setOnClickListener {
+            setReminderData(18)
         }
 
         btnCustomReminder.setOnClickListener {
 
-            openReminderDialogueBox()
+            setDialogBox()
 
-            /*val reminderDatePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Pick a time")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .setPositiveButtonText("Submit")
-                .build()
-            openCalender(reminderDatePicker, txtCustomReminder)*/
         }
 
 
     }
 
-    private fun openReminderDialogueBox() {
-
-        setDialogBox()
-
-
-    }
 
     private fun setDialogBox() {
         reminderDialog = Dialog(baseContext)
@@ -276,16 +355,11 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         btnSave.setOnClickListener {
 
-            val btnPressed = Intent("click").apply {
-                putExtra("clicked", noteId)
-                if (isAlarmSet){
-                    putExtra("reminder_id", reminderId)
-                }
-            }
-            LocalBroadcastManager.getInstance(baseContext).sendBroadcast(btnPressed)
 
+            setFragmentResult("requestClick", bundleOf("note_id" to noteId))
 
             reminderDialog.dismiss()
+
 
         }
     }
@@ -301,7 +375,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
         TabLayoutMediator(reminderTabLayout, reminderViewPager) { tab, pos ->
 
-            val tabNames = listOf("Date/Time", "Location")
+            val tabNames = listOf(getString(R.string.date_time), getString(R.string.location))
             tab.text = tabNames[pos]
 
         }.attach()
@@ -353,6 +427,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
 
     private fun setImage(uriList: ArrayList<String>) {
+        type = Constants.noteTypeImgPlusTxt
         imgListAdapter = AdapterImageList(baseContext, this)
         imgListAdapter.updateImages(uriList)
         binding.rcvEditImages.setHasFixedSize(true)
@@ -363,7 +438,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
     private fun initVars() {
 
-        mNotificationManager =  baseContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager =
+            baseContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         imgDataList = ArrayList<String>()
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -396,6 +472,33 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
                     binding.lytEditNoteImage.visibility = View.VISIBLE
                     setImage(imgDataList)
                 }
+            }
+
+            if (reminderData?.id != null) {
+
+                binding.lytFinalReminderTime.visibility = View.VISIBLE
+
+                val currentTimeFormat =
+                    SimpleDateFormat("LLLL dd, hh:mm aaa", Locale.getDefault())
+
+                val txtTime = currentTimeFormat.format(reminderData?.reminderTimestamp)
+
+                if (reminderData?.reminderRepetition != 0L) {
+                    binding.reminderIcon.setPadding(8)
+                    Glide.with(baseContext)
+                        .load(AppCompatResources.getDrawable(baseContext, R.drawable.repeat))
+                        .into(binding.reminderIcon)
+                } else {
+
+                    Glide.with(baseContext)
+                        .load(AppCompatResources.getDrawable(baseContext, R.drawable.reminder_asset))
+                        .into(binding.reminderIcon)
+                }
+
+                binding.txtSelectedTime.text = txtTime
+            } else {
+
+                binding.lytFinalReminderTime.visibility = View.GONE
             }
         } else {
             noteId = Utils.getNoteId()
@@ -448,19 +551,24 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
         val title = binding.edtTitleNote.text.toString()
         val note = binding.edtNote.text.toString()
         val timeStamp = System.currentTimeMillis()
-        val type = Constants.noteTypeTxt
+        type = Constants.noteTypeTxt
+
 
         setImage(imgDataList)
 
 
+        showLoader()
+
         if (validateFields()) {
 
-            val xyz = runBlocking {
-                async {
-                    setReminder(title, note)
-                    setNote(title, note, timeStamp, type)
-                }.await()
+
+            runBlocking {
+                setReminder(title, note)
+                setNote(title, note, timeStamp)
+//                noteViewModel.allNotesWithReminder(getUserIdFromPrefs()!!)
             }
+            closeLoader()
+            baseContext.supportFragmentManager.popBackStackImmediate()
 
 
         } else {
@@ -470,25 +578,38 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
 
     }
 
-    private fun setNote(title: String, note: String, timeStamp: Long, type: String) {
+    private suspend fun setNote(
+        title: String,
+        note: String,
+        timeStamp: Long,
+
+        ) {
+
+        type = if (imgDataList.isNotEmpty()) {
+            Constants.noteTypeImgPlusTxt
+        } else {
+            Constants.noteTypeTxt
+        }
+
         if (editNote == true) {
             newNote = Note(
                 title,
+                getUserIdFromPrefs()!!,
                 note,
                 type,
                 timeStamp,
                 listToString.listToString(imgDataList),
                 noteId,
                 isAlarmSet,
-
-                )
+            )
             noteViewModel.updateNote(newNote!!)
-            baseContext.supportFragmentManager.popBackStackImmediate()
+
 
         } else {
             newNote =
                 Note(
                     title,
+                    getUserIdFromPrefs()!!,
                     note,
                     type,
                     timeStamp,
@@ -496,19 +617,29 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
                     noteId,
                     isAlarmSet
                 )
-            baseContext.supportFragmentManager.popBackStackImmediate()
+
             noteViewModel.addNote(newNote!!)
+            closeLoader()
+//                    noteViewModel.createNoteOnline(com.nav.noteit.models.Note(noteId,title,timeStamp,type,note,isAlarmSet,listToString.listToString(imgDataList)))
 
         }
+
+
     }
 
-    private fun setReminder(title: String, note: String) {
+    private fun setReminder(
+        title: String,
+        note: String,
+    ) {
         reminderData?.let { reminderData ->
 
+            reminderData.title = title
 
-            if (isAlarmSet) {
-                reminderData.id = reminderId
-                Log.e("reminderId", reminderData.id.toString())
+            reminderData.id = reminderId
+
+            if (reminderData.id != null) {
+                Log.e("reminderId", reminderData.title.toString())
+
                 reminderViewModel.updateReminder(reminderData)
 
             } else {
@@ -522,41 +653,24 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     }
 
 
-
     private fun setReminderAlarm(reminderData: Reminder, title: String, note: String) {
 
-        val alarmItem = AlarmItem(reminderData.reminderTimestamp,title, note,reminderData.reminderRepetition,noteId)
+        val alarmItem = AlarmItem(
+            reminderData.reminderTimestamp,
+            reminderData.title!!,
+            note,
+            reminderData.reminderRepetition,
+            noteId,
+            reminderData.id
+        )
 
         alarmReminderViewModel.scheduleAlarm(alarmItem)
 
+
+
+
         Log.e("reminderData", Gson().toJson(reminderData))
 
-//        reminderAlarmManager = baseContext.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
-//        alarmPendingIntent = Intent(baseContext, ReminderManager(title, note, noteId)::class.java).let {
-//            PendingIntent.getBroadcast(
-//                baseContext, 1, it,
-//                PendingIntent.FLAG_IMMUTABLE
-//            )
-//        }
-//
-//        reminderAlarmManager?.apply {
-//            if (reminderData.reminderRepetition != 0L) {
-//
-//                setRepeating(
-//                    AlarmManager.RTC_WAKEUP,
-//                    reminderData.reminderTimestamp,
-//                    reminderData.reminderRepetition,
-//                    alarmPendingIntent
-//                )
-//            } else {
-//                set(
-//                    AlarmManager.RTC_WAKEUP,
-//                    reminderData.reminderTimestamp,
-//                    alarmPendingIntent
-//                )
-//            }
-//        }
-        isAlarmSet = true
     }
 
     private fun checkAndRequestPermission() {
@@ -596,6 +710,7 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
                             binding.lytEditNoteImage.visibility = View.VISIBLE
                         }
                     } else if (data.data != null) {
+
                         // Single image selected
                         val uri = data.data
                         binding.lytEditNoteImage.visibility = View.VISIBLE
@@ -631,40 +746,38 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            // Callback is invoked after the user selects a media item or closes the
-            // photo picker.
-            if (uri != null) {
-                baseContext.contentResolver.takePersistableUriPermission(uri, flag)
+        pickMedia =
+            registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                // Callback is invoked after the user selects a media item or closes the
+                // photo picker.
+                if (uri != null) {
+                    baseContext.contentResolver.takePersistableUriPermission(uri, flag)
 
 //                noteBitMap?.let { imgString = imgBitmapString.bitmapToString(it) }
 
-                uri.let { imgDataList.add(uri.toString()) }
+                    uri.let { imgDataList.add(uri.toString()) }
 
-                Log.e("image bitmap: ", imgString)
+                    Log.e("image bitmap: ", imgString)
 
-                binding.lytEditNoteImage.visibility = View.VISIBLE
-                setImage(imgDataList)
+                    binding.lytEditNoteImage.visibility = View.VISIBLE
+                    setImage(imgDataList)
 
-                Log.d("PhotoPicker", "Selected URI: $uri")
-            } else {
-                Log.d("PhotoPicker", "No media selected")
+                    Log.d("PhotoPicker", "Selected URI: $uri")
+                } else {
+                    Log.d("PhotoPicker", "No media selected")
+                }
             }
-        }
         changeToSaveIcon(true, this)
         changeIconToBack(true)
 
-//        if(imgDataList.isEmpty()){
-//            binding.rcvEditImages.visibility = View.GONE
-//        }else{
-//            binding.rcvEditImages.visibility = View.VISIBLE
-//        }
     }
 
     fun setInstance(editNote: Boolean, note: NoteWithReminder?): Fragment {
         this.oldNote = note?.note
         this.reminderId = note?.reminder?.id
         this.editNote = editNote
+        this.reminderData = note?.reminder
+        Log.e("reminder ID", note?.reminder?.id.toString())
         return this
     }
 
@@ -690,8 +803,8 @@ class FragEditNote : FragBase<FragEditNoteBinding>(), ActMain.ClickListeners,
     }
 
     override fun onSaveBtnClick() {
+
         insertNote()
-        Log.e("image list in string", listToString.listToString(imgDataList))
     }
 
     override fun onImageClick(imagePos: Int) {

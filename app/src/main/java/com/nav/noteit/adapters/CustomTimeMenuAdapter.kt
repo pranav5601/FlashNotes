@@ -16,7 +16,7 @@ class CustomTimeMenuAdapter(private val context: Context, private val itemList: 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getCount(): Int {
-        return itemList.size
+        return 5
     }
 
     override fun getItem(position: Int): TimeItem {

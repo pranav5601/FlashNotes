@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +16,10 @@ import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.nav.noteit.R
 import com.nav.noteit.databaseRelations.NoteWithReminder
-import com.nav.noteit.fragments.FragNotes
 import com.nav.noteit.helper.Constants
-import com.nav.noteit.room_models.Note
 import java.util.*
 
-class AdapterNotes(private val context: Context,private val clickListener: ClickListeners): RecyclerView.Adapter<AdapterNotes.MyViewHolder>() {
+class AdapterNotes(private val context: Context,private val clickListener: ClickListeners, private val userId: String): RecyclerView.Adapter<AdapterNotes.MyViewHolder>() {
 
 
     private var notesList =  ArrayList<NoteWithReminder>()
@@ -52,6 +51,21 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
                 clickListener.onItemClicked(note)
             }
 
+            if (note.note.imageList.length > 2){
+                val pattern = Regex("""content://media/picker/0/com\.android\.providers\.media\.photopicker/media/\d+""")
+
+
+                val imgList = pattern.findAll(note.note.imageList).map { it.value }.toList()
+
+                val imgUri = Uri.parse(imgList[0])
+
+
+                Glide.with(context).load(imgUri).into(imgNote)
+
+
+            }
+
+
             lytMainNote.setOnLongClickListener {
                 clickListener.onLongIteClicked(note,lytMainNote)
                 true
@@ -68,7 +82,6 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
                 lytTxtNote.visibility = View.VISIBLE
                 lytImgNote.visibility = View.GONE
             }else{
-                lytTxtNote.visibility = View.GONE
                 lytImgNote.visibility = View.VISIBLE
 
             }
@@ -99,6 +112,7 @@ class AdapterNotes(private val context: Context,private val clickListener: Click
             }
 
         }else{
+            notesList.clear()
             notesList.addAll(fullList)
         }
         notifyDataSetChanged()

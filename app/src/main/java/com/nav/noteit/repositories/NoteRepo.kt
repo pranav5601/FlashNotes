@@ -13,7 +13,15 @@ class NoteRepo(private val noteDatabase: NoteDatabase) {
 
     val allNotes:LiveData<List<Note>> = noteDao.getAllNotes()
 
-    val allNotesWithReminder: LiveData<List<NoteWithReminder>>? = noteDatabase.getNoteWithReminderDao().getNoteWithReminder()
+
+    fun allNotesWithReminder(userId: String):LiveData<List<NoteWithReminder>>{
+        return noteDatabase.getNoteWithReminderDao().getNoteWithReminder(userId)
+    }
+
+    fun getNoteDataById(noteId: String): LiveData<NoteWithReminder>{
+        val id = noteId.toInt()
+        return noteDatabase.getNoteWithReminderDao().getNoteWithReminderByNoteId(id)
+    }
 
     suspend fun insert(note:Note){
         noteDao.insertNote(note)

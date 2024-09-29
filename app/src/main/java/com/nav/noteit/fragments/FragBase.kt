@@ -8,13 +8,24 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.nav.noteit.activities.ActBase
+import com.nav.noteit.activities.ActLogin
 import com.nav.noteit.activities.ActMain
+import com.nav.noteit.viewmodel.UserViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import org.koin.android.ext.android.inject
 
 
 abstract class FragBase<T : ViewBinding> : Fragment() {
 
-    var _binding: T? = null
+    private var _binding: T? = null
     val binding: T get() = _binding ?: error("error")
+
+    val userId: String = ""
+    val userViewModel: UserViewModel by inject()
+
+    val noteReminderCoroutineScope = Dispatchers.IO + SupervisorJob()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,13 +63,37 @@ abstract class FragBase<T : ViewBinding> : Fragment() {
 
     }
 
+    fun getUserIdFromPrefs():String? = userViewModel.userId.value
+
+
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        userViewModel.getUserId()
+
         setUpFrag()
 
+
+    }
+
+    fun showLoader(){
+        if(baseContext is ActMain){
+            (baseContext as? ActMain)?.showLoader()
+        }
+        if(baseContext is ActLogin){
+            (baseContext as? ActLogin)?.showLoader()
+        }
+    }
+    fun closeLoader(){
+        if(baseContext is ActMain){
+            (baseContext as? ActMain)?.closeLoader()
+        }
+        if(baseContext is ActLogin){
+            (baseContext as? ActLogin)?.closeLoader()
+        }
     }
 
     override fun onDestroy() {

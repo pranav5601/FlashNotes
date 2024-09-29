@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/lyt_cell_reminder"
+    android:layout_width="match_parent"
+    android:background="@drawable/reminder_cell_bg"
+    android:layout_margin="5dp"
+    android:padding="7dp"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:textSize="20sp"
+        android:textColor="@color/txt_color"
+        android:text="@string/_01_00_pm"
+        android:id="@+id/txtReminderTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:textSize="17sp"
+        android:textColor="@color/txt_color"
+        android:text="Note Title"
+        android:id="@+id/txtReminderTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtReminderTime" />
+
+    <TextView
+        android:textSize="17sp"
+        android:textColor="@color/txt_color"
+        android:text="This will repeat once."
+        android:id="@+id/txtReminderRepetition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtReminderTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
